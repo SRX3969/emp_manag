@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-app: #F8F9FA;
+    --surface: #FFFFFF;
+    --surface-elevated: #F1F3F5;
+    --text-primary: #171717;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --border-color: #E5E7EB;
+    --border-subtle: #F3F4F6;
+    
+    --accent: #2563EB;
+    --accent-hover: #1D4ED8;
+    --accent-subtle: #EFF6FF;
+    --accent-text: #1E40AF;
+
+    --status-success: #10B981;
+    --status-success-bg: #ECFDF5;
+    --status-success-text: #065F46;
+
+    --status-warning: #F59E0B;
+    --status-warning-bg: #FFFBEB;
+    --status-warning-text: #92400E;
+
+    --status-danger: #EF4444;
+    --status-danger-bg: #FEF2F2;
+    --status-danger-text: #991B1B;
+
+    --status-info: #3B82F6;
+    --status-info-bg: #EFF6FF;
+    --status-info-text: #1E40AF;
+  }
+
+  .dark {
+    --bg-app: #101113;
+    --surface: #17181B;
+    --surface-elevated: #1D1F23;
+    --text-primary: #F5F5F5;
+    --text-secondary: #9CA3AF;
+    --text-muted: #6B7280;
+    --border-color: #292B30;
+    --border-subtle: #202227;
+
+    --accent: #3B82F6;
+    --accent-hover: #60A5FA;
+    --accent-subtle: #1E293B;
+    --accent-text: #93C5FD;
+
+    --status-success: #10B981;
+    --status-success-bg: #064E3B;
+    --status-success-text: #A7F3D0;
+
+    --status-warning: #F59E0B;
+    --status-warning-bg: #78350F;
+    --status-warning-text: #FDE68A;
+
+    --status-danger: #EF4444;
+    --status-danger-bg: #7F1D1D;
+    --status-danger-text: #FECACA;
+
+    --status-info: #3B82F6;
+    --status-info-bg: #1E3A8A;
+    --status-info-text: #BFDBFE;
+  }
+
+  * {
+    border-color: var(--border-color);
+  }
+
+  body {
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Manrope', 'Inter', system-ui, sans-serif;
+    letter-spacing: -0.015em;
+  }
+}
+
+/* Custom Scrollbar for dense enterprise tables */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.4);
+  border-radius: 9999px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(75, 85, 99, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(107, 114, 128, 0.7);
+}
+
+/* Smooth Focus Rings */
+.focus-ring {
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 dark:focus-visible:ring-blue-500 focus-visible:ring-offset-1 focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#17181B];
+}
+
+/* Subtle enterprise transitions */
+.transition-subtle {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  transition-duration: 150ms;
+}
