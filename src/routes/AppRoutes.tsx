@@ -1,5 +1,6 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { Dashboard } from '@/pages/dashboard/Dashboard';
 import { EmployeeList } from '@/pages/employees/EmployeeList';
@@ -25,6 +26,14 @@ import { NotificationsPage } from '@/pages/notifications/NotificationsPage';
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage';
 
+function ProtectedRoute() {
+  const { isAuthenticated } = useAuth();
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  return <AppLayout />;
+}
+
 export function AppRoutes() {
   return (
     <Routes>
@@ -33,7 +42,7 @@ export function AppRoutes() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
       {/* Protected Application Container */}
-      <Route element={<AppLayout />}>
+      <Route element={<ProtectedRoute />}>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="/dashboard" element={<Dashboard />} />
 

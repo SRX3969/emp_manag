@@ -18,11 +18,14 @@ const initialOrganizations: Organization[] = [
   cleanProductionOrg,
 ];
 
+export type PortalType = 'EMPLOYER' | 'EMPLOYEE';
+
 interface AuthContextType {
   currentUser: User;
   currentOrg: Organization;
   organizations: Organization[];
   role: Role;
+  portalType: PortalType;
   permissions: Permission[];
   hasPermission: (permission: Permission) => boolean;
   switchRole: (role: Role) => void;
@@ -30,12 +33,18 @@ interface AuthContextType {
   createOrganization: (data: { name: string; currency: string; timezone: string }) => Organization;
   setUser: (user: User) => void;
   isAuthenticated: boolean;
+  login: (email: string, password?: string, targetRole?: Role) => boolean;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(() => {
+    const saved = localStorage.getItem('emp_auth_session');
+    return saved !== null ? saved === 'true' : true; // Default authenticated in demo mode
+  });
+
   const [organizations, setOrganizations] = useState<Organization[]>(() => {
     const saved = localStorage.getItem('emp_organizations');
     if (saved) {
@@ -66,6 +75,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { ...mockUsers[0], organizationId: currentOrg.id }; // Default: Rahul Sharma (SUPER_ADMIN)
   });
 
+  const portalType: PortalType = currentUser.role === 'EMPLOYEE' ? 'EMPLOYEE' : 'EMPLOYER';
+
   useEffect(() => {
     localStorage.setItem('emp_organizations', JSON.stringify(organizations));
   }, [organizations]);
@@ -73,6 +84,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     localStorage.setItem('emp_active_org_id', currentOrg.id);
   }, [currentOrg]);
+
+  useEffect(() => {
+    localStorage.setItem('emp_auth_session', String(isAuthenticated));
+  }, [isAuthenticated]);
 
   const permissions = ROLE_PERMISSIONS[currentUser.role] || [];
 
@@ -126,8 +141,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return newOrg;
   };
 
+  const login = (email: string, _password?: string, targetRole?: Role): boolean => {
+    let matchedUser = targetRole ? mockUsers.find((u) => u.role === targetRole) : null;
+    if (!matchedUser) {
+      matchedUser = mockUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    }
+    if (!matchedUser) {
+      // Fallback for custom emails
+      matchedUser = {
+        id: `user_${Date.now()}`,
+        email,
+        name: email.split('@')[0].replace('.', ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
+        role: targetRole || 'EMPLOYEE',
+        organizationId: currentOrg.id,
+        createdAt: new Date().toISOString(),
+      };
+    }
+
+    setCurrentUser({
+      ...matchedUser,
+      organizationId: currentOrg.id,
+    });
+    localStorage.setItem('emp_active_role', matchedUser.role);
+    setIsAuthenticated(true);
+    return true;
+  };
+
   const logout = () => {
-    switchRole('EMPLOYEE');
+    setIsAuthenticated(false);
   };
 
   return (
@@ -137,13 +178,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         currentOrg,
         organizations,
         role: currentUser.role,
+        portalType,
         permissions,
         hasPermission,
         switchRole,
         switchOrganization,
         createOrganization,
         setUser: setCurrentUser,
-        isAuthenticated: true,
+        isAuthenticated,
+        login,
         logout,
       }}
     >
