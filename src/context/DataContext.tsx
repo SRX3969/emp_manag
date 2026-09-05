@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Employee, EmployeeStatus } from '@/types/employee';
+import { Employee } from '@/types/employee';
 import { Department } from '@/types/department';
-import { AttendanceRecord, AttendanceCorrectionRequest } from '@/types/attendance';
+import { AttendanceRecord } from '@/types/attendance';
 import { LeaveType, LeaveBalance, LeaveRequest, Holiday } from '@/types/leave';
 import { PayrollRun, Payslip } from '@/types/payroll';
 import { PerformanceGoal, PerformanceReview } from '@/types/performance';
@@ -29,7 +29,7 @@ import {
 } from '@/data/mockData';
 import { useAuth } from './AuthContext';
 
-interface CompanySettings {
+export interface CompanySettings {
   companyName: string;
   companyEmail: string;
   companyPhone: string;
@@ -45,7 +45,7 @@ interface CompanySettings {
   twoFactorRequired: boolean;
 }
 
-const defaultSettings: CompanySettings = {
+const defaultDemoSettings: CompanySettings = {
   companyName: 'Apex Global Technologies Ltd.',
   companyEmail: 'contact@apexglobal.com',
   companyPhone: '+1 (555) 019-2834',
@@ -60,6 +60,12 @@ const defaultSettings: CompanySettings = {
   notifyOnPayrollRun: true,
   twoFactorRequired: true,
 };
+
+const defaultCleanLeaveTypes: LeaveType[] = [
+  { id: 'lt_1', organizationId: 'org_prod_clean', name: 'Annual / Paid Leave', code: 'AL', totalDaysPerYear: 20, carryForwardAllowed: true, maxCarryForwardDays: 5, isPaid: true, requiresAttachment: false, colorHex: '#2563EB' },
+  { id: 'lt_2', organizationId: 'org_prod_clean', name: 'Sick Leave', code: 'SL', totalDaysPerYear: 12, carryForwardAllowed: false, isPaid: true, requiresAttachment: true, colorHex: '#DC2626' },
+  { id: 'lt_3', organizationId: 'org_prod_clean', name: 'Casual Leave', code: 'CL', totalDaysPerYear: 8, carryForwardAllowed: false, isPaid: true, requiresAttachment: false, colorHex: '#D97706' },
+];
 
 interface DataContextType {
   employees: Employee[];
@@ -130,32 +136,286 @@ interface DataContextType {
 const DataContext = createContext<DataContextType | undefined>(undefined);
 
 export function DataProvider({ children }: { children: React.ReactNode }) {
-  const { currentUser } = useAuth();
+  const { currentUser, currentOrg } = useAuth();
 
-  const [employees, setEmployees] = useState<Employee[]>(mockEmployees);
-  const [departments, setDepartments] = useState<Department[]>(mockDepartments);
-  const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>(mockAttendanceRecords);
-  const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>(mockLeaveTypes);
-  const [leaveBalances, setLeaveBalances] = useState<LeaveBalance[]>(mockLeaveBalances);
-  const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>(mockLeaveRequests);
-  const [holidays, setHolidays] = useState<Holiday[]>(mockHolidays);
-  const [payrollRuns, setPayrollRuns] = useState<PayrollRun[]>(mockPayrollRuns);
-  const [payslips, setPayslips] = useState<Payslip[]>(mockPayslips);
-  const [goals, setGoals] = useState<PerformanceGoal[]>(mockGoals);
-  const [reviews, setReviews] = useState<PerformanceReview[]>(mockReviews);
-  const [documents, setDocuments] = useState<DocumentItem[]>(mockDocuments);
-  const [tasks, setTasks] = useState<TaskItem[]>(mockTasks);
-  const [announcements, setAnnouncements] = useState<AnnouncementItem[]>(mockAnnouncements);
-  const [jobs, setJobs] = useState<JobOpening[]>(mockJobs);
-  const [candidates, setCandidates] = useState<Candidate[]>(mockCandidates);
-  const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>(mockAuditLogs);
-  const [notifications, setNotifications] = useState<NotificationItem[]>(mockNotifications);
-  const [settings, setSettings] = useState<CompanySettings>(defaultSettings);
+  const getStorageKey = (key: string) => `emp_data_${currentOrg.id}_${key}`;
+
+  const isDemoOrg = currentOrg.isDemo ?? (currentOrg.id === 'org_001');
+
+  // Load state per organization
+  const [employees, setEmployees] = useState<Employee[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('employees'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockEmployees : [];
+  });
+
+  const [departments, setDepartments] = useState<Department[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('departments'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockDepartments : [];
+  });
+
+  const [attendanceRecords, setAttendanceRecords] = useState<AttendanceRecord[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('attendance'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockAttendanceRecords : [];
+  });
+
+  const [leaveTypes, setLeaveTypes] = useState<LeaveType[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('leaveTypes'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockLeaveTypes : defaultCleanLeaveTypes;
+  });
+
+  const [leaveBalances, setLeaveBalances] = useState<LeaveBalance[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('leaveBalances'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockLeaveBalances : [];
+  });
+
+  const [leaveRequests, setLeaveRequests] = useState<LeaveRequest[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('leaveRequests'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockLeaveRequests : [];
+  });
+
+  const [holidays, setHolidays] = useState<Holiday[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('holidays'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockHolidays : [];
+  });
+
+  const [payrollRuns, setPayrollRuns] = useState<PayrollRun[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('payrollRuns'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockPayrollRuns : [];
+  });
+
+  const [payslips, setPayslips] = useState<Payslip[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('payslips'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockPayslips : [];
+  });
+
+  const [goals, setGoals] = useState<PerformanceGoal[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('goals'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockGoals : [];
+  });
+
+  const [reviews, setReviews] = useState<PerformanceReview[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('reviews'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockReviews : [];
+  });
+
+  const [documents, setDocuments] = useState<DocumentItem[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('documents'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockDocuments : [];
+  });
+
+  const [tasks, setTasks] = useState<TaskItem[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('tasks'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockTasks : [];
+  });
+
+  const [announcements, setAnnouncements] = useState<AnnouncementItem[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('announcements'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockAnnouncements : [];
+  });
+
+  const [jobs, setJobs] = useState<JobOpening[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('jobs'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockJobs : [];
+  });
+
+  const [candidates, setCandidates] = useState<Candidate[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('candidates'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockCandidates : [];
+  });
+
+  const [auditLogs, setAuditLogs] = useState<AuditLogItem[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('auditLogs'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockAuditLogs : [];
+  });
+
+  const [notifications, setNotifications] = useState<NotificationItem[]>(() => {
+    const saved = localStorage.getItem(getStorageKey('notifications'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg ? mockNotifications : [];
+  });
+
+  const [settings, setSettings] = useState<CompanySettings>(() => {
+    const saved = localStorage.getItem(getStorageKey('settings'));
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return isDemoOrg
+      ? defaultDemoSettings
+      : {
+          companyName: currentOrg.name,
+          companyEmail: `admin@${currentOrg.slug}.com`,
+          companyPhone: '+1 (555) 000-0000',
+          companyAddress: 'Corporate Headquarters',
+          currency: currentOrg.currency,
+          timezone: currentOrg.timezone,
+          workDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+          standardWorkHours: 8,
+          allowRemoteClockIn: true,
+          autoApproveLeaves: false,
+          notifyOnLeaveRequest: true,
+          notifyOnPayrollRun: true,
+          twoFactorRequired: false,
+        };
+  });
+
+  // When switching organization, reload state cleanly
+  useEffect(() => {
+    const savedEmp = localStorage.getItem(getStorageKey('employees'));
+    setEmployees(savedEmp ? JSON.parse(savedEmp) : isDemoOrg ? mockEmployees : []);
+
+    const savedDept = localStorage.getItem(getStorageKey('departments'));
+    setDepartments(savedDept ? JSON.parse(savedDept) : isDemoOrg ? mockDepartments : []);
+
+    const savedAtt = localStorage.getItem(getStorageKey('attendance'));
+    setAttendanceRecords(savedAtt ? JSON.parse(savedAtt) : isDemoOrg ? mockAttendanceRecords : []);
+
+    const savedLt = localStorage.getItem(getStorageKey('leaveTypes'));
+    setLeaveTypes(savedLt ? JSON.parse(savedLt) : isDemoOrg ? mockLeaveTypes : defaultCleanLeaveTypes);
+
+    const savedLb = localStorage.getItem(getStorageKey('leaveBalances'));
+    setLeaveBalances(savedLb ? JSON.parse(savedLb) : isDemoOrg ? mockLeaveBalances : []);
+
+    const savedLr = localStorage.getItem(getStorageKey('leaveRequests'));
+    setLeaveRequests(savedLr ? JSON.parse(savedLr) : isDemoOrg ? mockLeaveRequests : []);
+
+    const savedHol = localStorage.getItem(getStorageKey('holidays'));
+    setHolidays(savedHol ? JSON.parse(savedHol) : isDemoOrg ? mockHolidays : []);
+
+    const savedPr = localStorage.getItem(getStorageKey('payrollRuns'));
+    setPayrollRuns(savedPr ? JSON.parse(savedPr) : isDemoOrg ? mockPayrollRuns : []);
+
+    const savedPs = localStorage.getItem(getStorageKey('payslips'));
+    setPayslips(savedPs ? JSON.parse(savedPs) : isDemoOrg ? mockPayslips : []);
+
+    const savedG = localStorage.getItem(getStorageKey('goals'));
+    setGoals(savedG ? JSON.parse(savedG) : isDemoOrg ? mockGoals : []);
+
+    const savedRev = localStorage.getItem(getStorageKey('reviews'));
+    setReviews(savedRev ? JSON.parse(savedRev) : isDemoOrg ? mockReviews : []);
+
+    const savedDoc = localStorage.getItem(getStorageKey('documents'));
+    setDocuments(savedDoc ? JSON.parse(savedDoc) : isDemoOrg ? mockDocuments : []);
+
+    const savedTasks = localStorage.getItem(getStorageKey('tasks'));
+    setTasks(savedTasks ? JSON.parse(savedTasks) : isDemoOrg ? mockTasks : []);
+
+    const savedAnn = localStorage.getItem(getStorageKey('announcements'));
+    setAnnouncements(savedAnn ? JSON.parse(savedAnn) : isDemoOrg ? mockAnnouncements : []);
+
+    const savedJobs = localStorage.getItem(getStorageKey('jobs'));
+    setJobs(savedJobs ? JSON.parse(savedJobs) : isDemoOrg ? mockJobs : []);
+
+    const savedCand = localStorage.getItem(getStorageKey('candidates'));
+    setCandidates(savedCand ? JSON.parse(savedCand) : isDemoOrg ? mockCandidates : []);
+
+    const savedAudit = localStorage.getItem(getStorageKey('auditLogs'));
+    setAuditLogs(savedAudit ? JSON.parse(savedAudit) : isDemoOrg ? mockAuditLogs : []);
+
+    const savedNotif = localStorage.getItem(getStorageKey('notifications'));
+    setNotifications(savedNotif ? JSON.parse(savedNotif) : isDemoOrg ? mockNotifications : []);
+
+    const savedSet = localStorage.getItem(getStorageKey('settings'));
+    setSettings(
+      savedSet
+        ? JSON.parse(savedSet)
+        : isDemoOrg
+        ? defaultDemoSettings
+        : {
+            companyName: currentOrg.name,
+            companyEmail: `admin@${currentOrg.slug}.com`,
+            companyPhone: '+1 (555) 000-0000',
+            companyAddress: 'Corporate Headquarters',
+            currency: currentOrg.currency,
+            timezone: currentOrg.timezone,
+            workDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+            standardWorkHours: 8,
+            allowRemoteClockIn: true,
+            autoApproveLeaves: false,
+            notifyOnLeaveRequest: true,
+            notifyOnPayrollRun: true,
+            twoFactorRequired: false,
+          }
+    );
+  }, [currentOrg.id]);
+
+  // Save changes to localStorage per organization
+  useEffect(() => { localStorage.setItem(getStorageKey('employees'), JSON.stringify(employees)); }, [employees, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('departments'), JSON.stringify(departments)); }, [departments, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('attendance'), JSON.stringify(attendanceRecords)); }, [attendanceRecords, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('leaveTypes'), JSON.stringify(leaveTypes)); }, [leaveTypes, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('leaveBalances'), JSON.stringify(leaveBalances)); }, [leaveBalances, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('leaveRequests'), JSON.stringify(leaveRequests)); }, [leaveRequests, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('holidays'), JSON.stringify(holidays)); }, [holidays, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('payrollRuns'), JSON.stringify(payrollRuns)); }, [payrollRuns, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('payslips'), JSON.stringify(payslips)); }, [payslips, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('goals'), JSON.stringify(goals)); }, [goals, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('reviews'), JSON.stringify(reviews)); }, [reviews, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('documents'), JSON.stringify(documents)); }, [documents, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('tasks'), JSON.stringify(tasks)); }, [tasks, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('announcements'), JSON.stringify(announcements)); }, [announcements, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('jobs'), JSON.stringify(jobs)); }, [jobs, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('candidates'), JSON.stringify(candidates)); }, [candidates, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('auditLogs'), JSON.stringify(auditLogs)); }, [auditLogs, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('notifications'), JSON.stringify(notifications)); }, [notifications, currentOrg.id]);
+  useEffect(() => { localStorage.setItem(getStorageKey('settings'), JSON.stringify(settings)); }, [settings, currentOrg.id]);
 
   const logAction = (action: string, entity: string, details: string, entityId?: string) => {
     const newLog: AuditLogItem = {
       id: `audit_${Date.now()}`,
-      organizationId: currentUser.organizationId,
+      organizationId: currentOrg.id,
       userId: currentUser.id,
       userName: currentUser.name,
       userRole: currentUser.role,
@@ -172,11 +432,30 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     const newId = `emp_${String(employees.length + 1).padStart(3, '0')}`;
     const newEmp: Employee = {
       ...empData,
+      organizationId: currentOrg.id,
       id: newId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
     setEmployees((prev) => [newEmp, ...prev]);
+
+    // Setup leave balances
+    const currentYear = new Date().getFullYear();
+    const newBalances: LeaveBalance[] = leaveTypes.map((lt) => ({
+      id: `bal_${newId}_${lt.id}`,
+      organizationId: currentOrg.id,
+      employeeId: newId,
+      leaveTypeId: lt.id,
+      leaveTypeName: lt.name,
+      leaveTypeCode: lt.code,
+      allocatedDays: lt.totalDaysPerYear,
+      usedDays: 0,
+      pendingDays: 0,
+      remainingDays: lt.totalDaysPerYear,
+      year: currentYear,
+    }));
+    setLeaveBalances((prev) => [...prev, ...newBalances]);
+
     logAction('EMPLOYEE_CREATED', 'Employee', `Created employee profile for ${newEmp.fullName} (${newEmp.employeeCode})`, newId);
   };
 
@@ -190,7 +469,6 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteEmployee = (id: string) => {
-    // Soft deactivate per enterprise requirement
     setEmployees((prev) =>
       prev.map((emp) =>
         emp.id === id ? { ...emp, status: 'INACTIVE', updatedAt: new Date().toISOString() } : emp
@@ -202,6 +480,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const addDepartment = (deptData: Omit<Department, 'id' | 'createdAt' | 'headcount'>) => {
     const newDept: Department = {
       ...deptData,
+      organizationId: currentOrg.id,
       id: `dept_${Date.now()}`,
       headcount: 0,
       createdAt: new Date().toISOString(),
@@ -223,7 +502,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     const today = new Date().toISOString().split('T')[0];
     const newRecord: AttendanceRecord = {
       id: `att_${Date.now()}`,
-      organizationId: targetEmp.organizationId,
+      organizationId: currentOrg.id,
       employeeId: targetEmp.id,
       employeeName: targetEmp.fullName,
       employeeCode: targetEmp.employeeCode,
@@ -256,21 +535,35 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         return r;
       })
     );
-    logAction('ATTENDANCE_CLOCK_OUT', 'Attendance', `Clocked out for employee ID: ${employeeId}`);
+    logAction('ATTENDANCE_CLOCK_OUT', 'Attendance', `Employee ID: ${employeeId} clocked out`);
   };
 
   const applyLeave = (reqData: Omit<LeaveRequest, 'id' | 'appliedOn' | 'status'>) => {
     const newReq: LeaveRequest = {
       ...reqData,
+      organizationId: currentOrg.id,
       id: `lr_${Date.now()}`,
-      appliedOn: new Date().toISOString(),
+      appliedOn: new Date().toISOString().split('T')[0],
       status: 'PENDING',
     };
     setLeaveRequests((prev) => [newReq, ...prev]);
-    logAction('LEAVE_APPLIED', 'LeaveRequest', `Submitted ${newReq.leaveTypeName} request (${newReq.startDate} to ${newReq.endDate}) by ${newReq.employeeName}`, newReq.id);
+
+    // Update pending balance
+    setLeaveBalances((prev) =>
+      prev.map((b) =>
+        b.employeeId === reqData.employeeId && b.leaveTypeId === reqData.leaveTypeId
+          ? { ...b, pendingDays: b.pendingDays + reqData.totalDays }
+          : b
+      )
+    );
+
+    logAction('LEAVE_APPLIED', 'Leave', `Leave request submitted by ${reqData.employeeName} (${reqData.totalDays} days)`, newReq.id);
   };
 
   const approveLeave = (id: string, comment?: string) => {
+    const req = leaveRequests.find((r) => r.id === id);
+    if (!req) return;
+
     setLeaveRequests((prev) =>
       prev.map((r) =>
         r.id === id
@@ -279,16 +572,48 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
               status: 'APPROVED',
               approverId: currentUser.id,
               approverName: currentUser.name,
-              approverComment: comment || 'Approved',
+              approverComment: comment || 'Approved by Manager',
               approvedAt: new Date().toISOString(),
             }
           : r
       )
     );
-    logAction('LEAVE_APPROVED', 'LeaveRequest', `Approved leave request ID: ${id}`, id);
+
+    // Deduct balance
+    setLeaveBalances((prev) =>
+      prev.map((b) =>
+        b.employeeId === req.employeeId && b.leaveTypeId === req.leaveTypeId
+          ? {
+              ...b,
+              usedDays: b.usedDays + req.totalDays,
+              pendingDays: Math.max(0, b.pendingDays - req.totalDays),
+              remainingDays: Math.max(0, b.remainingDays - req.totalDays),
+            }
+          : b
+      )
+    );
+
+    // Notification
+    const newNotif: NotificationItem = {
+      id: `notif_${Date.now()}`,
+      organizationId: currentOrg.id,
+      userId: req.employeeId,
+      title: 'Leave Request Approved',
+      message: `Your ${req.leaveTypeName} request for ${req.startDate} to ${req.endDate} was approved.`,
+      type: 'LEAVE',
+      isRead: false,
+      linkUrl: '/leave',
+      createdAt: new Date().toISOString(),
+    };
+    setNotifications((prev) => [newNotif, ...prev]);
+
+    logAction('LEAVE_APPROVED', 'Leave', `Approved leave request for ${req.employeeName}`, id);
   };
 
   const rejectLeave = (id: string, comment?: string) => {
+    const req = leaveRequests.find((r) => r.id === id);
+    if (!req) return;
+
     setLeaveRequests((prev) =>
       prev.map((r) =>
         r.id === id
@@ -297,26 +622,57 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
               status: 'REJECTED',
               approverId: currentUser.id,
               approverName: currentUser.name,
-              approverComment: comment || 'Rejected',
+              approverComment: comment || 'Rejected by Manager',
               approvedAt: new Date().toISOString(),
             }
           : r
       )
     );
-    logAction('LEAVE_REJECTED', 'LeaveRequest', `Rejected leave request ID: ${id}`, id);
+
+    setLeaveBalances((prev) =>
+      prev.map((b) =>
+        b.employeeId === req.employeeId && b.leaveTypeId === req.leaveTypeId
+          ? { ...b, pendingDays: Math.max(0, b.pendingDays - req.totalDays) }
+          : b
+      )
+    );
+
+    logAction('LEAVE_REJECTED', 'Leave', `Rejected leave request for ${req.employeeName}`, id);
   };
 
   const cancelLeave = (id: string) => {
-    setLeaveRequests((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, status: 'CANCELLED' } : r))
+    const req = leaveRequests.find((r) => r.id === id);
+    if (!req) return;
+
+    setLeaveRequests((prev) => prev.map((r) => (r.id === id ? { ...r, status: 'CANCELLED' } : r)));
+
+    setLeaveBalances((prev) =>
+      prev.map((b) => {
+        if (b.employeeId === req.employeeId && b.leaveTypeId === req.leaveTypeId) {
+          if (req.status === 'APPROVED') {
+            return {
+              ...b,
+              usedDays: Math.max(0, b.usedDays - req.totalDays),
+              remainingDays: b.remainingDays + req.totalDays,
+            };
+          }
+          return { ...b, pendingDays: Math.max(0, b.pendingDays - req.totalDays) };
+        }
+        return b;
+      })
     );
-    logAction('LEAVE_CANCELLED', 'LeaveRequest', `Cancelled leave request ID: ${id}`, id);
+
+    logAction('LEAVE_CANCELLED', 'Leave', `Cancelled leave request for ${req.employeeName}`, id);
   };
 
-  const addHoliday = (holiday: Omit<Holiday, 'id'>) => {
-    const newHol: Holiday = { ...holiday, id: `hol_${Date.now()}` };
+  const addHoliday = (holidayData: Omit<Holiday, 'id'>) => {
+    const newHol: Holiday = {
+      ...holidayData,
+      organizationId: currentOrg.id,
+      id: `hol_${Date.now()}`,
+    };
     setHolidays((prev) => [...prev, newHol]);
-    logAction('HOLIDAY_ADDED', 'Holiday', `Added official holiday: ${newHol.name} on ${newHol.date}`, newHol.id);
+    logAction('HOLIDAY_ADDED', 'Holiday', `Added holiday: ${newHol.name} (${newHol.date})`, newHol.id);
   };
 
   const updateHoliday = (id: string, updates: Partial<Holiday>) => {
@@ -330,53 +686,121 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   };
 
   const createPayrollRun = (month: string, code: string, startDate: string, endDate: string) => {
+    const activeEmployees = employees.filter((e) => e.status !== 'INACTIVE');
+    const totalGross = activeEmployees.reduce((acc, curr) => acc + (curr.salary || 0), 0);
+    const totalDeductions = Math.round(totalGross * 0.15);
+    const totalNet = totalGross - totalDeductions;
+
     const newRun: PayrollRun = {
-      id: `pr_${code.replace('-', '_')}`,
-      organizationId: currentUser.organizationId,
+      id: `run_${Date.now()}`,
+      organizationId: currentOrg.id,
       payPeriodMonth: month,
       payPeriodCode: code,
       startDate,
       endDate,
-      totalEmployees: employees.filter((e) => e.status === 'ACTIVE').length,
-      totalGross: 865000,
-      totalDeductions: 181650,
-      totalNet: 683350,
+      totalEmployees: activeEmployees.length,
+      totalGross,
+      totalDeductions,
+      totalNet,
       status: 'DRAFT',
+      processedBy: currentUser.name,
+      processedAt: new Date().toISOString(),
       disbursementDate: endDate,
     };
     setPayrollRuns((prev) => [newRun, ...prev]);
-    logAction('PAYROLL_RUN_CREATED', 'PayrollRun', `Created draft payroll run for ${month}`, newRun.id);
+    logAction('PAYROLL_RUN_CREATED', 'Payroll', `Created draft payroll run ${code} for ${month}`, newRun.id);
   };
 
   const processPayrollRun = (runId: string) => {
+    const run = payrollRuns.find((r) => r.id === runId);
+    if (!run) return;
+
     setPayrollRuns((prev) =>
-      prev.map((r) =>
-        r.id === runId
-          ? {
-              ...r,
-              status: 'COMPLETED',
-              processedBy: currentUser.name,
-              processedAt: new Date().toISOString(),
-            }
-          : r
-      )
+      prev.map((r) => (r.id === runId ? { ...r, status: 'COMPLETED', processedAt: new Date().toISOString() } : r))
     );
-    logAction('PAYROLL_DISBURSED', 'PayrollRun', `Processed and disbursed payroll run ID: ${runId}`, runId);
+
+    // Generate payslips
+    const activeEmployees = employees.filter((e) => e.status !== 'INACTIVE');
+    const newPayslips: Payslip[] = activeEmployees.map((emp) => {
+      const basic = emp.salary || 50000;
+      const hra = Math.round(basic * 0.4);
+      const conveyance = 1600;
+      const medical = 1250;
+      const special = Math.round(basic * 0.15);
+      const gross = basic + hra + conveyance + medical + special;
+
+      const pf = Math.round(basic * 0.12);
+      const tax = Math.round(gross * 0.1);
+      const pt = 200;
+      const deductions = pf + tax + pt;
+      const net = gross - deductions;
+
+      return {
+        id: `ps_${Date.now()}_${emp.id}`,
+        organizationId: currentOrg.id,
+        payrollRunId: runId,
+        employeeId: emp.id,
+        employeeName: emp.fullName,
+        employeeCode: emp.employeeCode,
+        designation: emp.designation,
+        departmentName: emp.departmentName,
+        bankAccountNumber: emp.bankAccountNumber || '•••• 8921',
+        panNumber: emp.taxIdentificationNumber || 'ABCDE1234F',
+        payPeriod: run.payPeriodMonth,
+        paymentDate: run.disbursementDate,
+        paymentStatus: 'PAID',
+        basicSalary: basic,
+        hra,
+        conveyanceAllowance: conveyance,
+        medicalAllowance: medical,
+        specialAllowance: special,
+        bonus: 0,
+        overtimePay: 0,
+        grossEarnings: gross,
+        providentFund: pf,
+        incomeTax: tax,
+        professionalTax: pt,
+        otherDeductions: 0,
+        totalDeductions: deductions,
+        netPayable: net,
+        currency: emp.currency || 'USD',
+        generatedAt: new Date().toISOString(),
+      };
+    });
+
+    setPayslips((prev) => [...newPayslips, ...prev]);
+
+    // Send notifications to all active employees
+    const notificationsToAdd: NotificationItem[] = activeEmployees.map((emp) => ({
+      id: `notif_pay_${Date.now()}_${emp.id}`,
+      organizationId: currentOrg.id,
+      userId: emp.id,
+      title: `Payslip Disbursed: ${run.payPeriodMonth}`,
+      message: `Your payslip for ${run.payPeriodMonth} is now available in your personal portal.`,
+      type: 'PAYROLL',
+      isRead: false,
+      linkUrl: '/payroll',
+      createdAt: new Date().toISOString(),
+    }));
+    setNotifications((prev) => [...notificationsToAdd, ...prev]);
+
+    logAction('PAYROLL_DISBURSED', 'Payroll', `Disbursed payroll for run ${run.payPeriodCode} to ${activeEmployees.length} employees`, runId);
   };
 
   const addGoal = (goalData: Omit<PerformanceGoal, 'id' | 'createdAt'>) => {
     const newGoal: PerformanceGoal = {
       ...goalData,
+      organizationId: currentOrg.id,
       id: `goal_${Date.now()}`,
       createdAt: new Date().toISOString(),
     };
     setGoals((prev) => [newGoal, ...prev]);
-    logAction('GOAL_CREATED', 'PerformanceGoal', `Created goal: ${newGoal.title}`, newGoal.id);
+    logAction('GOAL_CREATED', 'Performance', `Created performance goal: "${newGoal.title}" for ${newGoal.employeeName}`, newGoal.id);
   };
 
   const updateGoal = (id: string, updates: Partial<PerformanceGoal>) => {
     setGoals((prev) => prev.map((g) => (g.id === id ? { ...g, ...updates } : g)));
-    logAction('GOAL_UPDATED', 'PerformanceGoal', `Updated goal ID: ${id}`, id);
+    logAction('GOAL_UPDATED', 'Performance', `Updated goal progress/status for ID: ${id}`, id);
   };
 
   const submitReview = (id: string, feedback: { rating: number; comments: string; isManager: boolean }) => {
@@ -388,34 +812,34 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
               ...r,
               managerRating: feedback.rating,
               managerFeedback: feedback.comments,
-              finalRating: Number((( (r.selfRating || feedback.rating) + feedback.rating ) / 2).toFixed(1)),
+              finalRating: feedback.rating,
               status: 'COMPLETED',
               completedAt: new Date().toISOString(),
             };
-          } else {
-            return {
-              ...r,
-              selfRating: feedback.rating,
-              selfFeedback: feedback.comments,
-              status: 'PENDING_MANAGER',
-              submittedAt: new Date().toISOString(),
-            };
           }
+          return {
+            ...r,
+            selfRating: feedback.rating,
+            selfFeedback: feedback.comments,
+            status: 'PENDING_MANAGER',
+            submittedAt: new Date().toISOString(),
+          };
         }
         return r;
       })
     );
-    logAction('PERFORMANCE_REVIEW_SUBMITTED', 'PerformanceReview', `Submitted review evaluation for ID: ${id}`, id);
+    logAction('REVIEW_SUBMITTED', 'Performance', `Submitted ${feedback.isManager ? 'manager' : 'self'} review for ID: ${id}`, id);
   };
 
   const uploadDocument = (docData: Omit<DocumentItem, 'id' | 'uploadedAt'>) => {
     const newDoc: DocumentItem = {
       ...docData,
+      organizationId: currentOrg.id,
       id: `doc_${Date.now()}`,
-      uploadedAt: new Date().toISOString(),
+      uploadedAt: new Date().toISOString().split('T')[0],
     };
     setDocuments((prev) => [newDoc, ...prev]);
-    logAction('DOCUMENT_UPLOADED', 'Document', `Uploaded document: ${newDoc.name} (${newDoc.category})`, newDoc.id);
+    logAction('DOCUMENT_UPLOADED', 'Document', `Uploaded ${newDoc.category} document: ${newDoc.name}`, newDoc.id);
   };
 
   const deleteDocument = (id: string) => {
@@ -426,11 +850,27 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const addTask = (taskData: Omit<TaskItem, 'id' | 'createdAt'>) => {
     const newTask: TaskItem = {
       ...taskData,
+      organizationId: currentOrg.id,
       id: `task_${Date.now()}`,
       createdAt: new Date().toISOString(),
     };
     setTasks((prev) => [newTask, ...prev]);
-    logAction('TASK_CREATED', 'Task', `Assigned task: ${newTask.title} to ${newTask.assigneeName}`, newTask.id);
+
+    // Send notification to assignee
+    const newNotif: NotificationItem = {
+      id: `notif_task_${Date.now()}`,
+      organizationId: currentOrg.id,
+      userId: newTask.assigneeId,
+      title: 'New Task Assigned',
+      message: `You were assigned: "${newTask.title}" (Due: ${newTask.dueDate})`,
+      type: 'TASK',
+      isRead: false,
+      linkUrl: '/tasks',
+      createdAt: new Date().toISOString(),
+    };
+    setNotifications((prev) => [newNotif, ...prev]);
+
+    logAction('TASK_CREATED', 'Task', `Created task: "${newTask.title}" assigned to ${newTask.assigneeName}`, newTask.id);
   };
 
   const updateTaskStatus = (id: string, status: TaskItem['status']) => {
@@ -445,97 +885,144 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           : t
       )
     );
-    logAction('TASK_STATUS_CHANGED', 'Task', `Updated task ID: ${id} status to ${status}`, id);
+    logAction('TASK_STATUS_UPDATED', 'Task', `Updated task ${id} status to ${status}`, id);
   };
 
   const createAnnouncement = (annData: Omit<AnnouncementItem, 'id' | 'publishedAt' | 'readCount'>) => {
     const newAnn: AnnouncementItem = {
       ...annData,
+      organizationId: currentOrg.id,
       id: `ann_${Date.now()}`,
-      publishedAt: new Date().toISOString(),
+      publishedAt: new Date().toISOString().split('T')[0],
       readCount: 0,
+      readByUserIds: [],
     };
     setAnnouncements((prev) => [newAnn, ...prev]);
-    logAction('ANNOUNCEMENT_PUBLISHED', 'Announcement', `Published notice: ${newAnn.title}`, newAnn.id);
+
+    // Notify all
+    const newNotif: NotificationItem = {
+      id: `notif_ann_${Date.now()}`,
+      organizationId: currentOrg.id,
+      userId: 'all',
+      title: `Announcement: ${newAnn.title}`,
+      message: newAnn.content.slice(0, 90) + '...',
+      type: 'ANNOUNCEMENT',
+      isRead: false,
+      linkUrl: '/announcements',
+      createdAt: new Date().toISOString(),
+    };
+    setNotifications((prev) => [newNotif, ...prev]);
+
+    logAction('ANNOUNCEMENT_PUBLISHED', 'Announcement', `Published company announcement: "${newAnn.title}"`, newAnn.id);
   };
 
   const markAnnouncementRead = (id: string) => {
     setAnnouncements((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, readCount: a.readCount + 1 } : a))
+      prev.map((a) => {
+        if (a.id === id) {
+          const reads = a.readByUserIds || [];
+          if (!reads.includes(currentUser.id)) {
+            return {
+              ...a,
+              readCount: a.readCount + 1,
+              readByUserIds: [...reads, currentUser.id],
+            };
+          }
+        }
+        return a;
+      })
     );
   };
 
   const addJob = (jobData: Omit<JobOpening, 'id' | 'createdAt'>) => {
     const newJob: JobOpening = {
       ...jobData,
+      organizationId: currentOrg.id,
       id: `job_${Date.now()}`,
-      createdAt: new Date().toISOString(),
+      createdAt: new Date().toISOString().split('T')[0],
     };
     setJobs((prev) => [newJob, ...prev]);
-    logAction('JOB_POSTED', 'JobOpening', `Posted job opening: ${newJob.title}`, newJob.id);
+    logAction('JOB_POSTED', 'Recruitment', `Posted new job opening: "${newJob.title}" in ${newJob.departmentName}`, newJob.id);
   };
 
   const updateCandidateStage = (id: string, stage: Candidate['stage']) => {
     setCandidates((prev) => prev.map((c) => (c.id === id ? { ...c, stage } : c)));
-    logAction('CANDIDATE_STAGE_UPDATED', 'Candidate', `Moved candidate ID: ${id} to stage ${stage}`, id);
+    logAction('CANDIDATE_STAGE_UPDATED', 'Recruitment', `Updated candidate ${id} stage to ${stage}`, id);
   };
 
-  const convertCandidateToEmployee = (
-    candidateId: string,
-    departmentId: string,
-    designation: string,
-    salary: number
-  ) => {
-    const candidate = candidates.find((c) => c.id === candidateId);
-    if (!candidate) return;
-    const department = departments.find((d) => d.id === departmentId);
-    const names = candidate.fullName.split(' ');
-    const firstName = names[0] || candidate.fullName;
-    const lastName = names.slice(1).join(' ') || 'Employee';
+  const convertCandidateToEmployee = (candidateId: string, departmentId: string, designation: string, salary: number) => {
+    const cand = candidates.find((c) => c.id === candidateId);
+    if (!cand) return;
 
-    addEmployee({
-      organizationId: currentUser.organizationId,
-      employeeCode: `EMP-00${String(employees.length + 101)}`,
+    const dept = departments.find((d) => d.id === departmentId);
+    const [firstName, ...rest] = cand.fullName.split(' ');
+    const lastName = rest.join(' ') || 'Employee';
+
+    const empCode = `EMP-${String(employees.length + 1).padStart(3, '0')}`;
+    const newEmp: Employee = {
+      id: `emp_${Date.now()}`,
+      organizationId: currentOrg.id,
+      employeeCode: empCode,
       firstName,
       lastName,
-      fullName: candidate.fullName,
-      email: candidate.email,
-      phone: candidate.phone,
+      fullName: cand.fullName,
+      email: cand.email,
+      phone: cand.phone,
       gender: 'PREFER_NOT_TO_SAY',
       dateOfBirth: '1995-01-01',
-      address: 'Corporate Headquarters',
-      city: 'New York',
+      address: 'On file',
+      city: 'Headquarters City',
       country: 'United States',
       postalCode: '10001',
       emergencyContact: {
-        name: 'Contact on file',
-        relationship: 'Other',
-        phone: candidate.phone,
+        name: 'Primary Contact',
+        relationship: 'Family',
+        phone: cand.phone,
       },
       departmentId,
-      departmentName: department?.name || 'General',
+      departmentName: dept?.name || 'Engineering',
       designation,
       joiningDate: new Date().toISOString().split('T')[0],
       employmentType: 'FULL_TIME',
-      workLocation: 'Hybrid',
-      status: 'PROBATION',
+      workLocation: 'On-site',
+      status: 'ACTIVE',
       salary,
       payType: 'SALARIED',
-      currency: 'USD',
-    });
+      currency: currentOrg.currency,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
 
-    updateCandidateStage(candidateId, 'HIRED');
+    setEmployees((prev) => [newEmp, ...prev]);
+    setCandidates((prev) => prev.map((c) => (c.id === candidateId ? { ...c, stage: 'HIRED' } : c)));
+
+    // Setup leave balances
+    const currentYear = new Date().getFullYear();
+    const newBalances: LeaveBalance[] = leaveTypes.map((lt) => ({
+      id: `bal_${newEmp.id}_${lt.id}`,
+      organizationId: currentOrg.id,
+      employeeId: newEmp.id,
+      leaveTypeId: lt.id,
+      leaveTypeName: lt.name,
+      leaveTypeCode: lt.code,
+      allocatedDays: lt.totalDaysPerYear,
+      usedDays: 0,
+      pendingDays: 0,
+      remainingDays: lt.totalDaysPerYear,
+      year: currentYear,
+    }));
+    setLeaveBalances((prev) => [...prev, ...newBalances]);
+
+    logAction('CANDIDATE_CONVERTED', 'Employee', `Converted candidate ${cand.fullName} into employee ${empCode}`, newEmp.id);
   };
 
   const updateSettings = (newSettings: Partial<CompanySettings>) => {
     setSettings((prev) => ({ ...prev, ...newSettings }));
-    logAction('SETTINGS_UPDATED', 'Settings', 'Updated organization configuration settings');
+    logAction('SETTINGS_UPDATED', 'Settings', 'Updated company settings and workplace policies');
   };
 
   const markNotificationRead = (id: string) => {
-    setNotifications((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, isRead: true } : n))
-    );
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, isRead: true } : n)));
   };
 
   const markAllNotificationsRead = () => {
@@ -564,34 +1051,46 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         auditLogs,
         notifications,
         settings,
+
         addEmployee,
         updateEmployee,
         deleteEmployee,
+
         addDepartment,
         updateDepartment,
+
         clockIn,
         clockOut,
+
         applyLeave,
         approveLeave,
         rejectLeave,
         cancelLeave,
+
         addHoliday,
         updateHoliday,
         deleteHoliday,
+
         createPayrollRun,
         processPayrollRun,
+
         addGoal,
         updateGoal,
         submitReview,
+
         uploadDocument,
         deleteDocument,
+
         addTask,
         updateTaskStatus,
+
         createAnnouncement,
         markAnnouncementRead,
+
         addJob,
         updateCandidateStage,
         convertCandidateToEmployee,
+
         updateSettings,
         markNotificationRead,
         markAllNotificationsRead,
