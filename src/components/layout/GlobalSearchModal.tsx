@@ -16,6 +16,9 @@ import {
   ShieldCheck,
   Settings,
   Sparkles,
+  Network,
+  Award,
+  Briefcase,
 } from 'lucide-react';
 import { useData } from '@/context/DataContext';
 import { useAuth } from '@/context/AuthContext';
@@ -55,7 +58,7 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
         title: 'Add New Employee',
         subtitle: 'Register and provision personnel profile',
         category: 'Quick Actions',
-        icon: <UserPlus className="w-4 h-4 text-blue-500" />,
+        icon: <UserPlus className="w-4 h-4 text-indigo-500" />,
         url: '/employees/new',
         adminOnly: true,
       },
@@ -82,6 +85,14 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
         category: 'Quick Actions',
         icon: <DollarSign className="w-4 h-4 text-purple-500" />,
         url: '/payroll',
+      },
+      {
+        id: 'act_org',
+        title: 'View Organization Hierarchy',
+        subtitle: 'Interactive tree map of executive reporting lines',
+        category: 'Quick Actions',
+        icon: <Network className="w-4 h-4 text-cyan-500" />,
+        url: '/organization',
       },
       {
         id: 'act_audit',
@@ -135,7 +146,7 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
         title: e.fullName,
         subtitle: `${e.employeeCode} · ${e.designation} (${e.departmentName})`,
         category: 'Employees',
-        icon: <Users className="w-4 h-4 text-blue-500" />,
+        icon: <Users className="w-4 h-4 text-indigo-500" />,
         url: `/employees/${e.id}`,
       }));
 
@@ -212,14 +223,14 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-20 p-4 select-none">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-20 p-3 sm:p-4 select-none">
       {/* Backdrop */}
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-[2px] animate-reveal-fade" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-xs animate-reveal-fade" onClick={onClose} />
 
       {/* Command Palette Modal */}
-      <div className="relative w-full max-w-xl rounded-xl bg-white dark:bg-[#17181B] border border-slate-200 dark:border-[#292B30] shadow-2xl overflow-hidden z-10 animate-reveal-scale">
+      <div className="relative w-full max-w-xl rounded-2xl bg-white dark:bg-[#12131A] border border-slate-200 dark:border-[#242838] shadow-2xl overflow-hidden z-10 animate-reveal-scale">
         {/* Input Header */}
-        <div className="flex items-center px-4 py-3.5 border-b border-slate-200 dark:border-[#292B30]">
+        <div className="flex items-center px-4 py-3.5 border-b border-slate-200 dark:border-[#242838] bg-slate-50/50 dark:bg-[#161822]/60">
           <Search className="w-4 h-4 text-slate-400 shrink-0 mr-3" />
           <input
             type="text"
@@ -236,12 +247,12 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
           {query && (
             <button
               onClick={() => setQuery('')}
-              className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 mr-1"
+              className="p-1 rounded text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 mr-1.5 cursor-pointer"
             >
               <X className="w-3.5 h-3.5" />
             </button>
           )}
-          <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#202227] border border-slate-200 dark:border-[#292B30] text-[10px] text-slate-500 font-mono">
+          <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-[#1A1C26] border border-slate-200 dark:border-[#242838] text-[10px] text-slate-500 font-mono shadow-2xs">
             ESC
           </kbd>
         </div>
@@ -256,7 +267,7 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
             <div className="space-y-1">
               {!query.trim() && (
                 <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-slate-400 font-semibold flex items-center gap-1.5">
-                  <Sparkles className="w-3 h-3 text-blue-500" />
+                  <Sparkles className="w-3 h-3 text-indigo-500" />
                   Suggested Actions & Shortcuts
                 </div>
               )}
@@ -265,14 +276,14 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
                   key={`${item.category}-${item.id}`}
                   onClick={() => handleSelect(item.url)}
                   onMouseEnter={() => setSelectedIndex(idx)}
-                  className={`flex items-center justify-between p-2.5 rounded-lg cursor-pointer text-xs transition-colors ${
+                  className={`flex items-center justify-between p-2.5 rounded-xl cursor-pointer text-xs transition-colors ${
                     selectedIndex === idx
-                      ? 'bg-blue-50 text-blue-900 dark:bg-blue-950/50 dark:text-blue-200 font-medium'
-                      : 'hover:bg-slate-50 text-slate-700 dark:hover:bg-[#1D1F23] dark:text-slate-300'
+                      ? 'bg-indigo-50 text-indigo-900 dark:bg-indigo-950/50 dark:text-indigo-200 font-medium'
+                      : 'hover:bg-slate-50 text-slate-700 dark:hover:bg-[#1A1C26] dark:text-slate-300'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="p-1.5 rounded-md bg-slate-100 dark:bg-[#202227] shrink-0">
+                    <div className="p-2 rounded-lg bg-slate-100 dark:bg-[#1A1C26] shrink-0 border border-slate-200/60 dark:border-[#242838]">
                       {item.icon}
                     </div>
                     <div className="min-w-0 truncate">
@@ -285,10 +296,10 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
                     </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-[10px] uppercase tracking-wider font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-[#202227] text-slate-500 dark:text-slate-400">
+                    <span className="text-[10px] uppercase tracking-wider font-mono px-2 py-0.5 rounded-md bg-slate-100 dark:bg-[#1A1C26] text-slate-500 dark:text-slate-400 border border-slate-200/60 dark:border-[#242838]">
                       {item.category}
                     </span>
-                    {selectedIndex === idx && <CornerDownLeft className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />}
+                    {selectedIndex === idx && <CornerDownLeft className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />}
                   </div>
                 </div>
               ))}
@@ -297,16 +308,16 @@ export function GlobalSearchModal({ isOpen, onClose }: GlobalSearchModalProps) {
         </div>
 
         {/* Keyboard Navigation Footer */}
-        <div className="flex items-center justify-between px-4 py-2.5 border-t border-slate-100 dark:border-[#202227] bg-slate-50/50 dark:bg-[#131417] text-[11px] text-slate-500 dark:text-slate-400">
+        <div className="flex items-center justify-between px-4 py-2.5 border-t border-slate-100 dark:border-[#242838] bg-slate-50/70 dark:bg-[#161822] text-[11px] text-slate-500 dark:text-slate-400">
           <div className="flex items-center gap-3">
             <span>
-              <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-[#1D1F23] border border-slate-200 dark:border-[#292B30] text-[10px] font-mono">
+              <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-[#1A1C26] border border-slate-200 dark:border-[#242838] text-[10px] font-mono shadow-2xs">
                 ↑↓
               </kbd>{' '}
               Navigate
             </span>
             <span>
-              <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-[#1D1F23] border border-slate-200 dark:border-[#292B30] text-[10px] font-mono">
+              <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-[#1A1C26] border border-slate-200 dark:border-[#242838] text-[10px] font-mono shadow-2xs">
                 ↵
               </kbd>{' '}
               Execute

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Role } from '@/types/auth';
-import { ShieldCheck, UserCheck, Check, UserCircle2, LogOut, Building2 } from 'lucide-react';
+import { ShieldCheck, Check, UserCircle2, LogOut, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,7 +18,7 @@ export function RoleSwitcherBar() {
     },
     {
       role: 'HR_ADMIN',
-      title: 'HR Admin',
+      title: 'HR Director',
       desc: 'Employee lifecycle, recruitment ATS, policies & attendance',
       portal: 'EMPLOYER',
     },
@@ -30,7 +30,7 @@ export function RoleSwitcherBar() {
     },
     {
       role: 'EMPLOYEE',
-      title: 'Employee Portal',
+      title: 'Employee',
       desc: 'Personal clock-in/out, leave balance, payslips & tasks',
       portal: 'EMPLOYEE',
     },
@@ -42,23 +42,23 @@ export function RoleSwitcherBar() {
   };
 
   return (
-    <div className="bg-slate-900 text-slate-100 dark:bg-black/90 border-b border-slate-800 text-xs px-4 py-1.5 flex flex-wrap items-center justify-between gap-3 select-none">
+    <div className="bg-[#0B0C10] text-slate-200 border-b border-[#242838] text-xs px-3 sm:px-4 py-1.5 flex flex-wrap items-center justify-between gap-2.5 select-none z-30 relative shadow-xs">
       <div className="flex items-center gap-2">
-        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-blue-600/30 text-blue-300 font-mono text-[11px] font-semibold border border-blue-500/30">
-          <ShieldCheck className="w-3.5 h-3.5 text-blue-400" />
-          <span>PORTAL SIMULATOR</span>
+        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-indigo-500/20 text-indigo-300 font-mono text-[10.5px] font-bold border border-indigo-500/30 glow-accent">
+          <Sparkles className="w-3 h-3 text-indigo-400" />
+          <span>PORTAL DEMO MODE</span>
         </div>
-        <span className="font-semibold text-white flex items-center gap-1.5">
-          <UserCircle2 className="w-3.5 h-3.5 text-slate-300" />
+        <span className="font-semibold text-white flex items-center gap-1.5 text-xs truncate">
+          <UserCircle2 className="w-3.5 h-3.5 text-slate-400" />
           {currentUser.name}
-          <span className="text-slate-400 text-[11px] font-mono">
-            ({portalType === 'EMPLOYER' ? `${role} · Employer Portal` : 'Employee Self-Service'})
+          <span className="text-slate-400 text-[11px] font-mono hidden xs:inline">
+            ({portalType === 'EMPLOYER' ? `${role.replace('_', ' ')} · Employer View` : 'Employee Self-Service'})
           </span>
         </span>
       </div>
 
-      <div className="flex items-center gap-2 overflow-x-auto">
-        <span className="text-slate-400 text-[11px] hidden md:inline">Switch Persona:</span>
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar">
+        <span className="text-slate-400 text-[11px] font-medium hidden md:inline">Test As:</span>
         <div className="flex items-center gap-1">
           {roles.map((r) => {
             const isActive = role === r.role;
@@ -68,27 +68,27 @@ export function RoleSwitcherBar() {
                 onClick={() => switchRole(r.role)}
                 title={r.desc}
                 className={cn(
-                  'px-2.5 py-1 rounded text-xs font-medium transition-all flex items-center gap-1 shrink-0 cursor-pointer',
+                  'px-2.5 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-1 shrink-0 cursor-pointer',
                   isActive
-                    ? 'bg-blue-600 text-white shadow-xs font-semibold ring-1 ring-blue-400'
-                    : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white border border-slate-700/60'
+                    ? 'bg-indigo-600 text-white shadow-xs font-semibold ring-1 ring-indigo-400'
+                    : 'bg-[#161822] text-slate-300 hover:bg-[#1E202E] hover:text-white border border-[#242838]'
                 )}
               >
-                {isActive && <Check className="w-3 h-3 text-white" />}
+                {isActive && <Check className="w-3 h-3 text-white shrink-0" />}
                 <span>{r.title}</span>
               </button>
             );
           })}
         </div>
 
-        <div className="h-4 w-px bg-slate-700 mx-1 hidden sm:block" />
+        <div className="h-4 w-px bg-slate-800 mx-1 hidden sm:block" />
 
         <button
           onClick={handleSignOut}
-          className="flex items-center gap-1 px-2 py-1 rounded text-[11px] text-red-400 hover:bg-red-950/40 hover:text-red-300 border border-red-900/40 transition-colors cursor-pointer"
+          className="flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 border border-rose-900/40 transition-colors cursor-pointer"
           title="Sign Out to Login Portal"
         >
-          <LogOut className="w-3 h-3" />
+          <LogOut className="w-3 h-3 shrink-0" />
           <span className="hidden sm:inline">Sign Out</span>
         </button>
       </div>

@@ -18,7 +18,7 @@ interface TabsProps {
 export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
   return (
     <div className={cn('border-b border-slate-200 dark:border-[#292B30]', className)}>
-      <nav className="flex space-x-6 overflow-x-auto no-scrollbar" aria-label="Tabs">
+      <nav className="flex space-x-4 sm:space-x-6 overflow-x-auto no-scrollbar w-full max-w-full py-0.5" aria-label="Tabs">
         {tabs.map((tab) => {
           const isActive = tab.id === activeTab;
           return (
@@ -26,9 +26,9 @@ export function Tabs({ tabs, activeTab, onChange, className }: TabsProps) {
               key={tab.id}
               onClick={() => onChange(tab.id)}
               className={cn(
-                'group inline-flex items-center gap-2 border-b-2 py-3 px-1 text-sm font-medium transition-all whitespace-nowrap',
+                'group inline-flex items-center gap-2 border-b-2 py-2.5 sm:py-3 px-1 text-xs sm:text-sm font-medium transition-all whitespace-nowrap shrink-0 cursor-pointer',
                 isActive
-                  ? 'border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-400'
+                  ? 'border-blue-600 text-blue-600 dark:border-blue-500 dark:text-blue-400 font-semibold'
                   : 'border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700 dark:text-slate-400 dark:hover:border-slate-600 dark:hover:text-slate-200'
               )}
             >

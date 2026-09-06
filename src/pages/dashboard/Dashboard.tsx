@@ -438,11 +438,11 @@ export function Dashboard() {
               </div>
 
               {/* Filter Pills */}
-              <div className="flex items-center gap-1.5 text-xs">
+              <div className="flex flex-wrap items-center gap-1.5 text-xs w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={() => setPresenceFilter('ALL')}
-                  className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer shrink-0 ${
                     presenceFilter === 'ALL'
                       ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
                       : 'bg-slate-100 dark:bg-[#1F2228] text-slate-600 dark:text-slate-400 hover:text-slate-900'
@@ -541,7 +541,7 @@ export function Dashboard() {
           {/* Interactive Visual Analytics Suite */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Chart 1: Headcount Growth Velocity */}
-            <RevealCard delayMs={240} className="lg:col-span-2 p-6 flex flex-col justify-between">
+            <RevealCard delayMs={240} className="lg:col-span-2 p-6 flex flex-col justify-between min-w-0 w-full overflow-hidden">
               <div>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
                   <div className="flex items-center gap-2">
@@ -620,7 +620,7 @@ export function Dashboard() {
             </RevealCard>
 
             {/* Chart 2: Department Distribution & Presence */}
-            <RevealCard delayMs={280} className="p-6 flex flex-col justify-between">
+            <RevealCard delayMs={280} className="p-6 flex flex-col justify-between min-w-0 w-full overflow-hidden">
               <div>
                 <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
                   <div className="flex items-center gap-2">
@@ -1049,13 +1049,13 @@ export function Dashboard() {
               </div>
 
               {/* Latest Payslip Callout */}
-              <div className="mt-6 p-4 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-900/40 flex items-center justify-between text-xs">
+              <div className="mt-6 p-4 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-900/40 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-3.5">
-                  <div className="p-2.5 rounded-xl bg-blue-600 text-white shadow-xs">
+                  <div className="p-2.5 rounded-xl bg-blue-600 text-white shadow-xs shrink-0">
                     <DollarSign className="w-5 h-5" />
                   </div>
-                  <div>
-                    <p className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                  <div className="min-w-0">
+                    <p className="font-bold text-sm text-slate-900 dark:text-slate-100 truncate">
                       Latest Payslip: {latestPayslip?.payPeriod || 'August 2026'}
                     </p>
                     <p className="text-slate-500 dark:text-slate-400 text-xs">
@@ -1063,7 +1063,7 @@ export function Dashboard() {
                     </p>
                   </div>
                 </div>
-                <Link to="/payroll">
+                <Link to="/payroll" className="shrink-0 self-end sm:self-center">
                   <Button size="sm" variant="outline" rightIcon={<ChevronRight className="w-3.5 h-3.5" />}>
                     View Payslip
                   </Button>
