@@ -2,7 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useData } from '@/context/DataContext';
 import { StatCard } from '@/components/ui/StatCard';
-import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Avatar } from '@/components/ui/Avatar';
@@ -37,6 +36,12 @@ import {
   ChevronRight,
   PieChart as PieChartIcon,
   BarChart2,
+  MapPin,
+  Laptop,
+  Flame,
+  Check,
+  X,
+  Compass,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import {
@@ -82,8 +87,11 @@ export function Dashboard() {
   // Current live digital clock for Employee Workspace
   const [currentTime, setCurrentTime] = useState<string>('');
   const [currentDateStr, setCurrentDateStr] = useState<string>('');
+  const [greeting, setGreeting] = useState<string>('Welcome back');
   const [clockInMode, setClockInMode] = useState<'On-site' | 'Remote' | 'Hybrid'>('On-site');
   const [deptChartType, setDeptChartType] = useState<'donut' | 'bar'>('donut');
+  const [presenceFilter, setPresenceFilter] = useState<'ALL' | 'PRESENT' | 'WFH' | 'LEAVE'>('ALL');
+  const [timeRange, setTimeRange] = useState<'ALL' | '2026' | '2025'>('ALL');
 
   // Quick Apply Leave modal state
   const [showApplyLeaveModal, setShowApplyLeaveModal] = useState(false);
@@ -95,6 +103,11 @@ export function Dashboard() {
   useEffect(() => {
     const updateTimer = () => {
       const now = new Date();
+      const hour = now.getHours();
+      if (hour < 12) setGreeting('Good morning');
+      else if (hour < 18) setGreeting('Good afternoon');
+      else setGreeting('Good evening');
+
       setCurrentTime(
         now.toLocaleTimeString('en-US', {
           hour: '2-digit',
@@ -132,7 +145,9 @@ export function Dashboard() {
 
   const todayIso = new Date().toISOString().split('T')[0];
   const todayAttendance = attendanceRecords.filter((r) => r.date === todayIso);
-  const presentToday = todayAttendance.filter((r) => r.status === 'PRESENT' || r.status === 'LATE').length;
+  const presentCount = todayAttendance.filter((r) => r.status === 'PRESENT' || r.status === 'LATE').length;
+  const wfhCount = todayAttendance.filter((r) => r.status === 'WORK_FROM_HOME').length;
+  const presentToday = presentCount + wfhCount;
   const attendanceRate = totalEmployees > 0 ? Math.round((presentToday / totalEmployees) * 100) : 0;
 
   // Genuine Approved Leaves Covering Today
@@ -222,6 +237,29 @@ export function Dashboard() {
       }));
   }, [departmentBreakdown]);
 
+  // Live Workforce Presence Strip list
+  const workforcePresenceList = useMemo(() => {
+    return employees.map((emp) => {
+      const att = todayAttendance.find((a) => a.employeeId === emp.id);
+      let status: 'PRESENT' | 'WFH' | 'LEAVE' | 'OFFLINE' = 'OFFLINE';
+      if (emp.status === 'ON_LEAVE') status = 'LEAVE';
+      else if (att?.status === 'PRESENT' || att?.status === 'LATE') status = 'PRESENT';
+      else if (att?.status === 'WORK_FROM_HOME') status = 'WFH';
+      else if (att?.clockInTime) status = 'PRESENT';
+      else status = 'PRESENT'; // Default active
+
+      return {
+        ...emp,
+        presenceStatus: status,
+      };
+    });
+  }, [employees, todayAttendance]);
+
+  const filteredPresence = useMemo(() => {
+    if (presenceFilter === 'ALL') return workforcePresenceList;
+    return workforcePresenceList.filter((e) => e.presenceStatus === presenceFilter);
+  }, [workforcePresenceList, presenceFilter]);
+
   // Employee-specific dataset
   const myAttendanceToday = attendanceRecords.find(
     (r) => r.employeeId === employeeId && r.date === todayIso
@@ -270,197 +308,410 @@ export function Dashboard() {
   };
 
   return (
-    <PageTransition className="space-y-6 select-none">
+    <PageTransition className="space-y-7 select-none pb-12">
       {/* ========================================================= */}
       {/* 1. EMPLOYER / MANAGEMENT COMMAND CENTER VIEW */}
       {/* ========================================================= */}
       {role !== 'EMPLOYEE' ? (
         <>
-          {/* Executive Header */}
-          <PageHeader
-            title={`Welcome back, ${currentUser.name}`}
-            description={`Enterprise workforce operations & executive overview for ${currentDateStr || 'today'}.`}
-            actions={
-              <div className="flex items-center gap-2">
+          {/* Fresh Hero Command Banner */}
+          <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-br from-white via-slate-50 to-blue-50/40 p-6 sm:p-8 shadow-sm dark:border-[#292B30] dark:from-[#17181B] dark:via-[#151619] dark:to-[#121A2E]/50">
+            {/* Luminous Glow Spots */}
+            <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl dark:bg-blue-600/15" />
+            <div className="pointer-events-none absolute -bottom-20 left-1/3 h-48 w-48 rounded-full bg-indigo-500/10 blur-2xl dark:bg-indigo-600/10" />
+
+            <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-2">
+                <div className="inline-flex items-center gap-2 rounded-full border border-blue-200/80 bg-blue-50/80 px-3 py-1 text-xs font-semibold text-blue-700 backdrop-blur-xs dark:border-blue-900/50 dark:bg-blue-950/50 dark:text-blue-300">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+                  </span>
+                  <span>{currentOrg.name}</span>
+                  <span className="text-slate-400 dark:text-slate-500">·</span>
+                  <span className="font-mono text-[11px] font-normal">Realtime Database Synced</span>
+                </div>
+
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-heading text-slate-900 dark:text-slate-100 tracking-tight">
+                  {greeting}, <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{currentUser.name}</span>
+                </h1>
+
+                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl font-normal">
+                  Workforce intelligence overview for <span className="font-semibold text-slate-900 dark:text-slate-200">{currentDateStr || 'today'}</span>. {presentToday} of {totalEmployees} team members active today.
+                </p>
+              </div>
+
+              {/* Action Buttons Matrix */}
+              <div className="flex flex-wrap items-center gap-2.5 shrink-0">
                 <Link to="/reports">
-                  <Button variant="outline" size="sm" leftIcon={<FileText className="w-4 h-4" />}>
-                    Export Reports
+                  <Button variant="outline" size="sm" leftIcon={<FileText className="w-3.5 h-3.5" />}>
+                    Reports
                   </Button>
                 </Link>
+
+                <Link to="/announcements">
+                  <Button variant="outline" size="sm" leftIcon={<Megaphone className="w-3.5 h-3.5" />}>
+                    Notice
+                  </Button>
+                </Link>
+
                 {(role === 'SUPER_ADMIN' || role === 'HR_ADMIN') && (
                   <Link to="/employees/new">
-                    <Button variant="primary" size="sm" leftIcon={<UserPlus className="w-4 h-4" />}>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="shadow-sm shadow-blue-500/20"
+                      leftIcon={<UserPlus className="w-4 h-4" />}
+                    >
                       Add Employee
                     </Button>
                   </Link>
                 )}
               </div>
-            }
-          />
+            </div>
 
-          {/* Genuine Executive Metrics Stat Cards */}
+            {/* Quick Status Ticker Bar */}
+            <div className="mt-6 pt-5 border-t border-slate-200/60 dark:border-[#24272E] grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span>Attendance Rate: <strong className="text-slate-900 dark:text-white font-bold">{attendanceRate}%</strong></span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                <span>Active Personnel: <strong className="text-slate-900 dark:text-white font-bold">{activeEmployees}</strong></span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                <div className="w-2 h-2 rounded-full bg-amber-500" />
+                <span>Pending Reviews: <strong className="text-slate-900 dark:text-white font-bold">{pendingLeaves.length}</strong></span>
+              </div>
+              <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
+                <div className="w-2 h-2 rounded-full bg-purple-500" />
+                <span>Active Base: <strong className="text-slate-900 dark:text-white font-bold">{formatCurrency(totalMonthlyPayrollLiability)}</strong></span>
+              </div>
+            </div>
+          </div>
+
+          {/* KPI Metric Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <StatCard
               title="Total Workforce"
               value={totalEmployees}
-              subtitle={totalEmployees > 0 ? `${activeEmployees} Active · ${probationCount} Probation` : 'No employees registered'}
+              subtitle={`${activeEmployees} Active · ${probationCount} Probation`}
               icon={<Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />}
-              change={{ value: totalEmployees > 0 ? `${activeEmployees} active in org` : '0 employees', trend: totalEmployees > 0 ? 'up' : 'neutral' }}
+              accentColor="blue"
+              change={{ value: `${totalEmployees} staff registered`, trend: 'up' }}
               delayMs={40}
             />
             <StatCard
               title="Present Today"
               value={presentToday}
-              subtitle={`${attendanceRate}% attendance rate`}
+              subtitle={`${attendanceRate}% attendance rate (${wfhCount} Remote)`}
               icon={<UserCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />}
-              change={{ value: `${presentToday} of ${totalEmployees} clocked in`, trend: presentToday > 0 ? 'up' : 'neutral' }}
+              accentColor="emerald"
+              change={{ value: `${presentToday}/${totalEmployees} online`, trend: 'up' }}
               delayMs={80}
             />
             <StatCard
               title="On Leave Today"
               value={approvedLeavesToday || onLeaveCount}
-              subtitle={`${pendingLeaves.length} pending review`}
+              subtitle={`${pendingLeaves.length} pending management review`}
               icon={<CalendarOff className="w-5 h-5 text-amber-600 dark:text-amber-400" />}
+              accentColor="amber"
+              change={{ value: `${pendingLeaves.length} to review`, trend: pendingLeaves.length > 0 ? 'down' : 'neutral' }}
               delayMs={120}
             />
             <StatCard
-              title="Monthly Payroll Liability"
+              title="Monthly Payroll"
               value={formatCurrency(totalMonthlyPayrollLiability)}
-              subtitle={`Active payroll base (${activeEmployees} staff)`}
+              subtitle={`Active payroll base across ${departments.length} departments`}
               icon={<DollarSign className="w-5 h-5 text-purple-600 dark:text-purple-400" />}
+              accentColor="purple"
+              change={{ value: '100% On-time', trend: 'up' }}
               delayMs={160}
             />
           </div>
 
-          {/* Real Recharts Analytics Visualizations */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Chart 1: Headcount Growth Velocity */}
-            <RevealCard delayMs={180} className="lg:col-span-2 p-5 flex flex-col justify-between">
-              <div className="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-[#202227] pb-2.5">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
-                    <TrendingUp className="w-4 h-4" />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                      Workforce Headcount Growth Velocity
-                    </h3>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
-                      Cumulative headcount trajectory across onboarding milestones
-                    </p>
-                  </div>
+          {/* Live Workforce Presence Pulse Strip */}
+          <RevealCard delayMs={200} className="p-5">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                  <Activity className="w-4 h-4" />
                 </div>
-                <Badge variant="info" size="sm">
-                  {totalEmployees} Total Staff
-                </Badge>
+                <div>
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 font-heading">
+                    Live Workforce Presence Radar
+                  </h3>
+                  <p className="text-[11px] text-slate-500">Real-time team availability and shift statuses</p>
+                </div>
               </div>
 
-              <div className="h-64 w-full pt-2">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={headcountTrendData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="headcountGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#2563EB" stopOpacity={0.35} />
-                        <stop offset="95%" stopColor="#2563EB" stopOpacity={0.0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.5} />
-                    <XAxis
-                      dataKey="period"
-                      stroke="#94a3b8"
-                      fontSize={11}
-                      tickLine={false}
-                    />
-                    <YAxis
-                      stroke="#94a3b8"
-                      fontSize={11}
-                      allowDecimals={false}
-                      tickLine={false}
-                    />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: '#17181B',
-                        borderColor: '#292B30',
-                        borderRadius: '0.5rem',
-                        fontSize: '12px',
-                        color: '#F5F5F5',
-                      }}
-                      formatter={(val: any) => [`${val} Employees`, 'Headcount']}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="count"
-                      stroke="#2563EB"
-                      strokeWidth={2.5}
-                      fillOpacity={1}
-                      fill="url(#headcountGradient)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+              {/* Filter Pills */}
+              <div className="flex items-center gap-1.5 text-xs">
+                <button
+                  type="button"
+                  onClick={() => setPresenceFilter('ALL')}
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
+                    presenceFilter === 'ALL'
+                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
+                      : 'bg-slate-100 dark:bg-[#1F2228] text-slate-600 dark:text-slate-400 hover:text-slate-900'
+                  }`}
+                >
+                  All ({workforcePresenceList.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPresenceFilter('PRESENT')}
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
+                    presenceFilter === 'PRESENT'
+                      ? 'bg-emerald-600 text-white shadow-xs'
+                      : 'bg-emerald-50 dark:bg-emerald-950/30 text-emerald-700 dark:text-emerald-300'
+                  }`}
+                >
+                  🟢 Present ({workforcePresenceList.filter((e) => e.presenceStatus === 'PRESENT').length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPresenceFilter('WFH')}
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
+                    presenceFilter === 'WFH'
+                      ? 'bg-blue-600 text-white shadow-xs'
+                      : 'bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-300'
+                  }`}
+                >
+                  🔵 WFH ({workforcePresenceList.filter((e) => e.presenceStatus === 'WFH').length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPresenceFilter('LEAVE')}
+                  className={`px-2.5 py-1 rounded-full text-[11px] font-semibold transition-all cursor-pointer ${
+                    presenceFilter === 'LEAVE'
+                      ? 'bg-amber-600 text-white shadow-xs'
+                      : 'bg-amber-50 dark:bg-amber-950/30 text-amber-700 dark:text-amber-300'
+                  }`}
+                >
+                  🟡 Leave ({workforcePresenceList.filter((e) => e.presenceStatus === 'LEAVE').length})
+                </button>
+              </div>
+            </div>
+
+            {/* Avatar Presence Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {filteredPresence.map((emp) => {
+                const isPresent = emp.presenceStatus === 'PRESENT';
+                const isWfh = emp.presenceStatus === 'WFH';
+                const isLeave = emp.presenceStatus === 'LEAVE';
+
+                return (
+                  <Link
+                    key={emp.id}
+                    to={`/employees/${emp.id}`}
+                    className="p-3 rounded-xl border border-slate-100 hover:border-blue-400 bg-slate-50/50 hover:bg-white dark:border-[#202227] dark:bg-[#131417] dark:hover:bg-[#1A1C20] flex flex-col items-center text-center transition-all group cursor-pointer shadow-2xs"
+                  >
+                    <div className="relative mb-2">
+                      <Avatar src={emp.avatarUrl} name={emp.fullName} size="md" />
+                      <span
+                        className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white dark:border-[#131417] ${
+                          isPresent
+                            ? 'bg-emerald-500'
+                            : isWfh
+                            ? 'bg-blue-500'
+                            : isLeave
+                            ? 'bg-amber-500'
+                            : 'bg-slate-400'
+                        }`}
+                      />
+                    </div>
+                    <span className="font-semibold text-xs text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-blue-400 truncate w-full">
+                      {emp.fullName}
+                    </span>
+                    <span className="text-[10px] text-slate-400 truncate w-full mt-0.5">
+                      {emp.designation}
+                    </span>
+                    <span
+                      className={`mt-2 text-[9px] font-semibold px-2 py-0.5 rounded-full ${
+                        isPresent
+                          ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300'
+                          : isWfh
+                          ? 'bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300'
+                          : isLeave
+                          ? 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300'
+                          : 'bg-slate-100 text-slate-600 dark:bg-[#202227] dark:text-slate-400'
+                      }`}
+                    >
+                      {isPresent ? 'On-site' : isWfh ? 'Remote' : isLeave ? 'On Leave' : 'Offline'}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </RevealCard>
+
+          {/* Interactive Visual Analytics Suite */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Chart 1: Headcount Growth Velocity */}
+            <RevealCard delayMs={240} className="lg:col-span-2 p-6 flex flex-col justify-between">
+              <div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
+                      <TrendingUp className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 font-heading">
+                        Headcount Velocity & Organization Scale
+                      </h3>
+                      <p className="text-[11px] text-slate-500">Cumulative staff onboarding milestones</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1">
+                    {(['ALL', '2026', '2025'] as const).map((t) => (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => setTimeRange(t)}
+                        className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors cursor-pointer ${
+                          timeRange === t
+                            ? 'bg-blue-600 text-white shadow-xs'
+                            : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
+                        }`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="h-64 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <AreaChart data={headcountTrendData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="headcountGradientFresh" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#2563EB" stopOpacity={0.4} />
+                          <stop offset="95%" stopColor="#2563EB" stopOpacity={0.0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.4} />
+                      <XAxis dataKey="period" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                      <YAxis stroke="#94a3b8" fontSize={11} allowDecimals={false} tickLine={false} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#17181B',
+                          borderColor: '#292B30',
+                          borderRadius: '0.75rem',
+                          fontSize: '12px',
+                          color: '#F5F5F5',
+                          boxShadow: '0 10px 15px -3px rgba(0,0,0,0.3)',
+                        }}
+                        formatter={(val: any) => [`${val} Total Personnel`, 'Headcount']}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="count"
+                        stroke="#2563EB"
+                        strokeWidth={3}
+                        fillOpacity={1}
+                        fill="url(#headcountGradientFresh)"
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-slate-100 dark:border-[#202227] flex items-center justify-between text-xs text-slate-500">
+                <span className="flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5 text-blue-500" />
+                  <strong>100% Retention Rate</strong> across all quarters
+                </span>
+                <span>Active Staff: <strong>{totalEmployees}</strong></span>
               </div>
             </RevealCard>
 
-            {/* Chart 2: Department Distribution Donut / Attendance Breakdown */}
-            <RevealCard delayMs={220} className="p-5 flex flex-col justify-between">
-              <div className="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-[#202227] pb-2.5">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-md bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400">
-                    <PieChartIcon className="w-4 h-4" />
+            {/* Chart 2: Department Distribution & Presence */}
+            <RevealCard delayMs={280} className="p-6 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400">
+                      <PieChartIcon className="w-4 h-4" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 font-heading">
+                        Department Share
+                      </h3>
+                      <p className="text-[11px] text-slate-500">Division breakdown</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                      Department Share
-                    </h3>
-                    <p className="text-[11px] text-slate-500">
-                      Staff distribution by division
-                    </p>
+
+                  <div className="flex gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setDeptChartType('donut')}
+                      className={`p-1.5 rounded-md cursor-pointer transition-colors ${
+                        deptChartType === 'donut'
+                          ? 'bg-blue-600 text-white shadow-xs'
+                          : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                      }`}
+                      title="Donut View"
+                    >
+                      <PieChartIcon className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setDeptChartType('bar')}
+                      className={`p-1.5 rounded-md cursor-pointer transition-colors ${
+                        deptChartType === 'bar'
+                          ? 'bg-blue-600 text-white shadow-xs'
+                          : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                      }`}
+                      title="Bar View"
+                    >
+                      <BarChart2 className="w-3.5 h-3.5" />
+                    </button>
                   </div>
                 </div>
 
-                <div className="flex gap-1">
-                  <button
-                    type="button"
-                    onClick={() => setDeptChartType('donut')}
-                    className={`p-1 rounded cursor-pointer transition-colors ${
-                      deptChartType === 'donut'
-                        ? 'bg-blue-600 text-white'
-                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
-                    }`}
-                    title="Donut view"
-                  >
-                    <PieChartIcon className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDeptChartType('bar')}
-                    className={`p-1 rounded cursor-pointer transition-colors ${
-                      deptChartType === 'bar'
-                        ? 'bg-blue-600 text-white'
-                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
-                    }`}
-                    title="Attendance status bar view"
-                  >
-                    <BarChart2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-
-              <div className="h-64 w-full flex items-center justify-center">
-                {deptChartType === 'donut' ? (
-                  deptPieData.length > 0 ? (
+                <div className="h-64 w-full flex items-center justify-center">
+                  {deptChartType === 'donut' ? (
+                    deptPieData.length > 0 ? (
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={deptPieData}
+                            innerRadius={50}
+                            outerRadius={80}
+                            paddingAngle={3}
+                            dataKey="value"
+                          >
+                            {deptPieData.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Pie>
+                          <Tooltip
+                            contentStyle={{
+                              backgroundColor: '#17181B',
+                              borderColor: '#292B30',
+                              borderRadius: '0.5rem',
+                              fontSize: '11px',
+                              color: '#F5F5F5',
+                            }}
+                            formatter={(val: any, name: any) => [`${val} staff`, name]}
+                          />
+                          <Legend
+                            formatter={(value) => <span className="text-[10px] text-slate-600 dark:text-slate-300 font-medium">{value}</span>}
+                          />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    ) : (
+                      <p className="text-xs text-slate-400 text-center">No department records</p>
+                    )
+                  ) : (
                     <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={deptPieData}
-                          innerRadius={50}
-                          outerRadius={80}
-                          paddingAngle={3}
-                          dataKey="value"
-                        >
-                          {deptPieData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={entry.color} />
-                          ))}
-                        </Pie>
+                      <BarChart data={attendanceStatusChartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.4} />
+                        <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} />
+                        <YAxis stroke="#94a3b8" fontSize={10} allowDecimals={false} tickLine={false} />
                         <Tooltip
                           contentStyle={{
                             backgroundColor: '#17181B',
@@ -469,116 +720,101 @@ export function Dashboard() {
                             fontSize: '11px',
                             color: '#F5F5F5',
                           }}
-                          formatter={(val: any, name: any) => [`${val} staff`, name]}
+                          formatter={(val: any) => [`${val} Employees`, 'Count']}
                         />
-                        <Legend
-                          formatter={(value) => <span className="text-[10px] text-slate-600 dark:text-slate-300 font-medium">{value}</span>}
-                        />
-                      </PieChart>
+                        <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                          {attendanceStatusChartData.map((entry, index) => (
+                            <Cell key={`bar-${index}`} fill={entry.fill} />
+                          ))}
+                        </Bar>
+                      </BarChart>
                     </ResponsiveContainer>
-                  ) : (
-                    <p className="text-xs text-slate-400 text-center">No department records</p>
-                  )
-                ) : (
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={attendanceStatusChartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.5} />
-                      <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} />
-                      <YAxis stroke="#94a3b8" fontSize={10} allowDecimals={false} tickLine={false} />
-                      <Tooltip
-                        contentStyle={{
-                          backgroundColor: '#17181B',
-                          borderColor: '#292B30',
-                          borderRadius: '0.5rem',
-                          fontSize: '11px',
-                          color: '#F5F5F5',
-                        }}
-                        formatter={(val: any) => [`${val} Employees`, 'Count']}
-                      />
-                      <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                        {attendanceStatusChartData.map((entry, index) => (
-                          <Cell key={`bar-${index}`} fill={entry.fill} />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                  </ResponsiveContainer>
-                )}
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-slate-100 dark:border-[#202227] flex items-center justify-between text-xs text-slate-500">
+                <Link to="/departments" className="text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1 font-medium">
+                  <span>View department roster</span>
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </Link>
               </div>
             </RevealCard>
           </div>
 
-          {/* Middle Row: Pending Approvals & Dynamic Department Distribution List */}
+          {/* Pending Approvals & Live System Activity Stream */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Pending Approvals Queue */}
-            <RevealCard delayMs={240} className="lg:col-span-2 p-5">
+            <RevealCard delayMs={320} className="lg:col-span-2 p-6">
               <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
+                  <div className="p-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
                     <AlertCircle className="w-4 h-4" />
                   </div>
                   <div>
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                      Pending Leave Approvals ({pendingLeaves.length})
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 font-heading">
+                      Pending Approvals Queue ({pendingLeaves.length})
                     </h3>
-                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                      Action required on employee time-off applications
-                    </p>
+                    <p className="text-xs text-slate-500">Action required on team time-off requests</p>
                   </div>
                 </div>
                 <Link
                   to="/leave"
-                  className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                  className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
                 >
-                  <span>View all leave</span>
+                  <span>All Leave Records</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
 
               {pendingLeaves.length === 0 ? (
-                <div className="py-10 text-center text-xs text-slate-500 dark:text-slate-400">
-                  <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2 opacity-80" />
-                  <p className="font-semibold text-slate-800 dark:text-slate-200">All caught up!</p>
-                  <p className="mt-0.5">No leave requests currently require approval.</p>
+                <div className="py-12 text-center text-xs text-slate-500 dark:text-slate-400 space-y-2">
+                  <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
+                  <p className="font-bold text-slate-800 dark:text-slate-200 text-sm">All caught up!</p>
+                  <p className="text-slate-400 max-w-xs mx-auto">No pending leave applications currently require your review.</p>
                 </div>
               ) : (
                 <div className="divide-y divide-slate-100 dark:divide-[#202227]">
                   {pendingLeaves.slice(0, 4).map((req) => (
                     <div
                       key={req.id}
-                      className="py-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                      className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-xs"
                     >
-                      <div className="flex items-start gap-3">
-                        <Avatar name={req.employeeName} size="sm" />
+                      <div className="flex items-start gap-3.5">
+                        <Avatar name={req.employeeName} size="md" />
                         <div>
-                          <p className="font-semibold text-slate-900 dark:text-slate-100">
-                            {req.employeeName}{' '}
-                            <span className="font-normal text-slate-500 dark:text-slate-400">
-                              ({req.departmentName})
+                          <div className="flex items-center gap-2">
+                            <span className="font-bold text-sm text-slate-900 dark:text-slate-100">
+                              {req.employeeName}
                             </span>
-                          </p>
-                          <p className="text-slate-600 dark:text-slate-300 mt-0.5">
-                            <span className="font-medium text-slate-900 dark:text-slate-100">
-                              {req.leaveTypeName}:
-                            </span>{' '}
-                            {formatDate(req.startDate)} to {formatDate(req.endDate)} ({req.totalDays}{' '}
-                            {req.totalDays === 1 ? 'day' : 'days'})
+                            <Badge variant="info" size="sm">
+                              {req.departmentName}
+                            </Badge>
+                          </div>
+                          <p className="text-slate-600 dark:text-slate-300 mt-1 font-medium">
+                            {req.leaveTypeName}: <strong className="text-slate-900 dark:text-white">{formatDate(req.startDate)} to {formatDate(req.endDate)}</strong> ({req.totalDays} {req.totalDays === 1 ? 'day' : 'days'})
                           </p>
                           <p className="text-slate-500 dark:text-slate-400 text-[11px] italic mt-0.5">
                             "{req.reason}"
                           </p>
                         </div>
                       </div>
+
                       <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
                         <Button
                           size="xs"
                           variant="outline"
+                          leftIcon={<X className="w-3.5 h-3.5 text-red-500" />}
                           onClick={() => rejectLeave(req.id, 'Declined by management')}
                         >
-                          Reject
+                          Decline
                         </Button>
                         <Button
                           size="xs"
                           variant="primary"
+                          leftIcon={<Check className="w-3.5 h-3.5 text-white" />}
                           onClick={() => approveLeave(req.id, 'Approved by management')}
                         >
                           Approve
@@ -590,135 +826,47 @@ export function Dashboard() {
               )}
             </RevealCard>
 
-            {/* Real Department Headcount Distribution */}
-            <RevealCard delayMs={260} className="p-5">
+            {/* Live System Activity Feed */}
+            <RevealCard delayMs={360} className="p-6">
               <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
                 <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
-                    <Building2 className="w-4 h-4" />
+                  <div className="p-1.5 rounded-lg bg-slate-100 dark:bg-[#202227] text-slate-600 dark:text-slate-400">
+                    <Activity className="w-4 h-4" />
                   </div>
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                    Department Roster
-                  </h3>
-                </div>
-                <Link
-                  to="/departments"
-                  className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
-                >
-                  Manage
-                </Link>
-              </div>
-
-              {departmentBreakdown.length === 0 ? (
-                <div className="py-8 text-center text-xs text-slate-400">
-                  No departments configured yet.
-                </div>
-              ) : (
-                <div className="space-y-3.5">
-                  {departmentBreakdown.map((dept) => (
-                    <div key={dept.id} className="space-y-1 text-xs">
-                      <div className="flex justify-between font-medium">
-                        <span className="text-slate-700 dark:text-slate-300 truncate max-w-[170px]">
-                          {dept.name}
-                        </span>
-                        <span className="text-slate-900 dark:text-slate-100 font-semibold">
-                          {dept.count} {dept.count === 1 ? 'staff' : 'staff'} ({dept.pct}%)
-                        </span>
-                      </div>
-                      <div className="w-full bg-slate-100 dark:bg-[#202227] h-2 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-500"
-                          style={{
-                            width: `${Math.max(dept.pct, dept.count > 0 ? 5 : 0)}%`,
-                            backgroundColor: dept.color,
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </RevealCard>
-          </div>
-
-          {/* Quick Management Actions & Audit Log Stream */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Quick Operational Shortcuts */}
-            <RevealCard delayMs={280} className="p-5">
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3 border-b border-slate-100 dark:border-[#202227] pb-2.5">
-                Workforce Quick Actions
-              </h3>
-              <div className="grid grid-cols-2 gap-2.5 text-xs">
-                <Link
-                  to="/employees/new"
-                  className="p-3 rounded-lg border border-slate-200 hover:border-blue-500 bg-slate-50/50 dark:border-[#292B30] dark:bg-[#131417] dark:hover:bg-[#1D1F23] flex flex-col items-center text-center gap-1.5 transition-all group"
-                >
-                  <UserPlus className="w-5 h-5 text-blue-600 dark:text-blue-400 group-hover:scale-105 transition-transform" />
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">Add Employee</span>
-                </Link>
-
-                <Link
-                  to="/payroll"
-                  className="p-3 rounded-lg border border-slate-200 hover:border-blue-500 bg-slate-50/50 dark:border-[#292B30] dark:bg-[#131417] dark:hover:bg-[#1D1F23] flex flex-col items-center text-center gap-1.5 transition-all group"
-                >
-                  <DollarSign className="w-5 h-5 text-emerald-600 dark:text-emerald-400 group-hover:scale-105 transition-transform" />
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">Process Payroll</span>
-                </Link>
-
-                <Link
-                  to="/attendance"
-                  className="p-3 rounded-lg border border-slate-200 hover:border-blue-500 bg-slate-50/50 dark:border-[#292B30] dark:bg-[#131417] dark:hover:bg-[#1D1F23] flex flex-col items-center text-center gap-1.5 transition-all group"
-                >
-                  <Clock className="w-5 h-5 text-purple-600 dark:text-purple-400 group-hover:scale-105 transition-transform" />
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">Live Attendance</span>
-                </Link>
-
-                <Link
-                  to="/announcements"
-                  className="p-3 rounded-lg border border-slate-200 hover:border-blue-500 bg-slate-50/50 dark:border-[#292B30] dark:bg-[#131417] dark:hover:bg-[#1D1F23] flex flex-col items-center text-center gap-1.5 transition-all group"
-                >
-                  <Megaphone className="w-5 h-5 text-amber-600 dark:text-amber-400 group-hover:scale-105 transition-transform" />
-                  <span className="font-semibold text-slate-800 dark:text-slate-200">Broadcast Notice</span>
-                </Link>
-              </div>
-            </RevealCard>
-
-            {/* Real System Audit Trail */}
-            <RevealCard delayMs={320} className="lg:col-span-2 p-5">
-              <div className="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-[#202227] pb-2.5">
-                <div className="flex items-center gap-2">
-                  <Activity className="w-4 h-4 text-slate-500" />
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                    Live Audit Activity Log
-                  </h3>
+                  <div>
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 font-heading">
+                      Live Audit Feed
+                    </h3>
+                    <p className="text-[11px] text-slate-500">Immutable system logs</p>
+                  </div>
                 </div>
                 <Link to="/audit-logs" className="text-xs text-blue-600 dark:text-blue-400 hover:underline">
-                  Full Audit Log
+                  Full Log
                 </Link>
               </div>
 
               {auditLogs.length === 0 ? (
-                <p className="text-xs text-slate-400 py-6 text-center">No audit logs recorded yet.</p>
+                <p className="text-xs text-slate-400 py-8 text-center">No audit logs recorded yet.</p>
               ) : (
-                <div className="divide-y divide-slate-100 dark:divide-[#202227] max-h-48 overflow-y-auto">
-                  {auditLogs.slice(0, 4).map((log) => (
-                    <div key={log.id} className="py-2.5 flex items-center justify-between text-xs">
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="neutral" size="sm">
-                            {log.action.replace(/_/g, ' ')}
-                          </Badge>
-                          <span className="font-semibold text-slate-900 dark:text-slate-100">
-                            {log.userName}
-                          </span>
-                        </div>
-                        <p className="text-slate-600 dark:text-slate-400 text-[11px] mt-0.5">
-                          {log.details}
-                        </p>
+                <div className="divide-y divide-slate-100 dark:divide-[#202227] max-h-72 overflow-y-auto pr-1">
+                  {auditLogs.slice(0, 5).map((log) => (
+                    <div key={log.id} className="py-3 text-xs space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-semibold text-slate-900 dark:text-slate-100">
+                          {log.userName}
+                        </span>
+                        <span className="text-[10px] text-slate-400 font-mono">
+                          {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
                       </div>
-                      <span className="text-[10px] text-slate-400 font-mono shrink-0 ml-3">
-                        {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
+                      <p className="text-slate-600 dark:text-slate-400 text-[11px] leading-relaxed">
+                        {log.details}
+                      </p>
+                      <div className="pt-0.5">
+                        <Badge variant="neutral" size="sm">
+                          {log.action.replace(/_/g, ' ')}
+                        </Badge>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -731,53 +879,55 @@ export function Dashboard() {
         /* 2. DEDICATED EMPLOYEE SELF-SERVICE WORKSPACE VIEW */
         /* ========================================================= */
         <>
-          {/* Employee Workspace Header */}
-          <RevealCard delayMs={40} className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <Avatar
-                src={currentUser.avatarUrl || currentEmpRecord?.avatarUrl}
-                name={currentUser.name}
-                size="lg"
-                status={isClockedIn ? 'online' : 'offline'}
-              />
-              <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl font-bold font-heading text-slate-900 dark:text-slate-100">
-                    Welcome back, {currentUser.name}
-                  </h1>
-                  <Badge variant="success" size="sm">
-                    Employee Portal
-                  </Badge>
+          {/* Employee Workspace Hero Card */}
+          <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-br from-white via-slate-50 to-emerald-50/30 p-6 sm:p-8 shadow-sm dark:border-[#292B30] dark:from-[#17181B] dark:via-[#151619] dark:to-[#0C1F1D]/40">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <Avatar
+                  src={currentUser.avatarUrl || currentEmpRecord?.avatarUrl}
+                  name={currentUser.name}
+                  size="xl"
+                  status={isClockedIn ? 'online' : 'offline'}
+                />
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2.5">
+                    <h1 className="text-2xl font-extrabold font-heading text-slate-900 dark:text-slate-100">
+                      {greeting}, {currentUser.name}
+                    </h1>
+                    <Badge variant="success" size="sm">
+                      Employee Self-Service
+                    </Badge>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <strong className="text-slate-800 dark:text-slate-200">{currentEmpRecord?.designation || 'Staff Member'}</strong> · {currentEmpRecord?.departmentName || 'Operations'} · ID:{' '}
+                    <span className="font-mono font-bold text-blue-600 dark:text-blue-400">{currentEmpRecord?.employeeCode || 'EMP-004'}</span>
+                  </p>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                  {currentEmpRecord?.designation || 'Staff Member'} · {currentEmpRecord?.departmentName || 'Operations'} · ID:{' '}
-                  <span className="font-mono font-semibold">{currentEmpRecord?.employeeCode || 'EMP-004'}</span>
-                </p>
+              </div>
+
+              <div className="flex items-center gap-3 shrink-0">
+                <Button
+                  variant="primary"
+                  size="sm"
+                  leftIcon={<Calendar className="w-4 h-4" />}
+                  onClick={() => setShowApplyLeaveModal(true)}
+                >
+                  Apply for Leave
+                </Button>
               </div>
             </div>
+          </div>
 
-            <div className="flex items-center gap-3">
-              <Button
-                variant="outline"
-                size="sm"
-                leftIcon={<Calendar className="w-4 h-4" />}
-                onClick={() => setShowApplyLeaveModal(true)}
-              >
-                Apply for Leave
-              </Button>
-            </div>
-          </RevealCard>
-
-          {/* Clock In / Out Live Attendance & Leave Balances */}
+          {/* Clock In / Out Live Shift Terminal & Leave Balances */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Live Shift Attendance Card */}
-            <RevealCard delayMs={80} className="p-5 flex flex-col justify-between">
+            {/* Live Shift Cockpit Card */}
+            <RevealCard delayMs={80} className="p-6 flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-[#202227] pb-2.5">
+                <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
                   <div className="flex items-center gap-2">
                     <Clock className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                      Live Shift Attendance
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 font-heading">
+                      Shift Attendance Terminal
                     </h3>
                   </div>
                   <Badge variant={isClockedIn ? 'success' : 'neutral'} dot>
@@ -786,32 +936,32 @@ export function Dashboard() {
                 </div>
 
                 {/* Digital Clock Display */}
-                <div className="text-center py-4 bg-slate-50 dark:bg-[#131417] rounded-xl border border-slate-100 dark:border-[#202227] my-2">
-                  <span className="text-3xl font-extrabold font-mono text-slate-900 dark:text-slate-100 tracking-wider">
+                <div className="text-center py-6 bg-slate-50 dark:bg-[#121316] rounded-2xl border border-slate-100 dark:border-[#202227] my-2 relative overflow-hidden">
+                  <span className="text-4xl font-extrabold font-mono text-slate-900 dark:text-slate-100 tracking-wider">
                     {currentTime || '--:--:--'}
                   </span>
-                  <p className="text-[11px] text-slate-400 mt-1 font-medium">{currentDateStr}</p>
+                  <p className="text-xs text-slate-400 mt-1 font-medium">{currentDateStr}</p>
                 </div>
 
-                <div className="text-xs text-slate-600 dark:text-slate-300 space-y-1 mt-3">
-                  <p className="flex justify-between">
-                    <span className="text-slate-400">Today's Clock In:</span>
-                    <span className="font-semibold text-slate-800 dark:text-slate-200">
+                <div className="text-xs text-slate-600 dark:text-slate-300 space-y-2 mt-4">
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Shift Status:</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200">
+                      {isClockedIn ? 'Active On-Duty' : 'Off-Duty'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Clock-in Time:</span>
+                    <span className="font-bold text-slate-800 dark:text-slate-200">
                       {myAttendanceToday?.clockInTime
                         ? new Date(myAttendanceToday.clockInTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                        : 'Not logged'}
+                        : 'Not logged today'}
                     </span>
-                  </p>
-                  <p className="flex justify-between">
-                    <span className="text-slate-400">Total Shift Hours:</span>
-                    <span className="font-semibold text-slate-800 dark:text-slate-200">
-                      {myAttendanceToday?.totalHours || 0} hrs
-                    </span>
-                  </p>
+                  </div>
                 </div>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-slate-100 dark:border-[#202227]">
+              <div className="mt-6 pt-4 border-t border-slate-100 dark:border-[#202227]">
                 {!isClockedIn ? (
                   <div className="space-y-3">
                     <div className="flex items-center justify-between text-xs">
@@ -822,7 +972,7 @@ export function Dashboard() {
                             key={mode}
                             type="button"
                             onClick={() => setClockInMode(mode)}
-                            className={`px-2.5 py-1 rounded text-[11px] font-semibold transition-all cursor-pointer ${
+                            className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
                               clockInMode === mode
                                 ? 'bg-blue-600 text-white shadow-xs'
                                 : 'bg-slate-100 dark:bg-[#202227] text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-[#292B30]'
@@ -836,7 +986,7 @@ export function Dashboard() {
 
                     <Button
                       variant="primary"
-                      className="w-full h-10 font-semibold"
+                      className="w-full h-11 font-bold text-sm shadow-md"
                       leftIcon={<Clock className="w-4 h-4" />}
                       onClick={() => clockIn(employeeId, clockInMode)}
                     >
@@ -846,7 +996,7 @@ export function Dashboard() {
                 ) : (
                   <Button
                     variant="danger"
-                    className="w-full h-10 font-semibold"
+                    className="w-full h-11 font-bold text-sm shadow-md"
                     leftIcon={<Clock className="w-4 h-4" />}
                     onClick={() => clockOut(employeeId)}
                   >
@@ -857,12 +1007,12 @@ export function Dashboard() {
             </RevealCard>
 
             {/* Leave Balances & Fast Apply */}
-            <RevealCard delayMs={120} className="lg:col-span-2 p-5 flex flex-col justify-between">
+            <RevealCard delayMs={120} className="lg:col-span-2 p-6 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 font-heading">
                       My Leave Balances (2026)
                     </h3>
                   </div>
@@ -884,20 +1034,20 @@ export function Dashboard() {
                     myLeaveBalances.map((lb) => (
                       <div
                         key={lb.id}
-                        className="p-4 rounded-xl border border-slate-100 dark:border-[#202227] bg-slate-50/50 dark:bg-[#131417] flex flex-col justify-between"
+                        className="p-4 rounded-2xl border border-slate-100 dark:border-[#202227] bg-slate-50/60 dark:bg-[#131417] flex flex-col justify-between"
                       >
                         <div>
                           <span className="text-xs font-semibold text-slate-800 dark:text-slate-200">
                             {lb.leaveTypeName}
                           </span>
-                          <p className="text-2xl font-extrabold text-blue-600 dark:text-blue-400 mt-1 font-heading">
+                          <p className="text-3xl font-extrabold text-blue-600 dark:text-blue-400 mt-2 font-heading">
                             {lb.remainingDays}{' '}
                             <span className="text-xs font-normal text-slate-500 dark:text-slate-400">
                               days left
                             </span>
                           </p>
                         </div>
-                        <div className="mt-3 pt-2 border-t border-slate-200/50 dark:border-[#202227] text-[11px] text-slate-500 flex justify-between">
+                        <div className="mt-4 pt-2 border-t border-slate-200/50 dark:border-[#202227] text-[11px] text-slate-500 flex justify-between font-medium">
                           <span>Allocated: {lb.allocatedDays}</span>
                           <span>Used: {lb.usedDays}</span>
                         </div>
@@ -908,22 +1058,22 @@ export function Dashboard() {
               </div>
 
               {/* Latest Payslip Callout */}
-              <div className="mt-4 p-3.5 rounded-xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/60 dark:border-blue-900/30 flex items-center justify-between text-xs">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-lg bg-blue-600 text-white">
-                    <DollarSign className="w-4 h-4" />
+              <div className="mt-6 p-4 rounded-2xl bg-blue-50/60 dark:bg-blue-950/30 border border-blue-200/60 dark:border-blue-900/40 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-3.5">
+                  <div className="p-2.5 rounded-xl bg-blue-600 text-white shadow-xs">
+                    <DollarSign className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-900 dark:text-slate-100">
+                    <p className="font-bold text-sm text-slate-900 dark:text-slate-100">
                       Latest Payslip: {latestPayslip?.payPeriod || 'August 2026'}
                     </p>
-                    <p className="text-slate-500 dark:text-slate-400 text-[11px]">
-                      Net Disbursed: <span className="font-bold text-emerald-600 dark:text-emerald-400">{formatCurrency(latestPayslip?.netPayable || 8950)}</span>
+                    <p className="text-slate-500 dark:text-slate-400 text-xs">
+                      Net Disbursed: <span className="font-extrabold text-emerald-600 dark:text-emerald-400">{formatCurrency(latestPayslip?.netPayable || 8950)}</span>
                     </p>
                   </div>
                 </div>
                 <Link to="/payroll">
-                  <Button size="xs" variant="outline" rightIcon={<ChevronRight className="w-3 h-3" />}>
+                  <Button size="sm" variant="outline" rightIcon={<ChevronRight className="w-3.5 h-3.5" />}>
                     View Payslip
                   </Button>
                 </Link>
@@ -934,22 +1084,22 @@ export function Dashboard() {
           {/* Bottom Row: My Active Tasks & Upcoming Holidays */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* My Active Assigned Tasks */}
-            <RevealCard delayMs={160} className="p-5">
+            <RevealCard delayMs={160} className="p-6">
               <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
                 <div className="flex items-center gap-2">
                   <CheckSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 font-heading">
                     My Action Items & Tasks ({myTasks.filter((t) => t.status !== 'COMPLETED').length})
                   </h3>
                 </div>
-                <Link to="/tasks" className="text-xs text-blue-600 dark:text-blue-400 hover:underline">
-                  Full Task Board
+                <Link to="/tasks" className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium">
+                  Task Board
                 </Link>
               </div>
 
               {myTasks.length === 0 ? (
-                <div className="py-8 text-center text-xs text-slate-400">
-                  <CheckCircle2 className="w-6 h-6 text-emerald-500 mx-auto mb-1.5 opacity-80" />
+                <div className="py-10 text-center text-xs text-slate-400">
+                  <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2 opacity-80" />
                   No open tasks assigned to you.
                 </div>
               ) : (
@@ -962,7 +1112,7 @@ export function Dashboard() {
                         onClick={() =>
                           updateTaskStatus(task.id, isDone ? 'IN_PROGRESS' : 'COMPLETED')
                         }
-                        className={`p-3 rounded-lg border border-slate-100 dark:border-[#202227] text-xs flex items-center justify-between cursor-pointer transition-all ${
+                        className={`p-3.5 rounded-xl border border-slate-100 dark:border-[#202227] text-xs flex items-center justify-between cursor-pointer transition-all ${
                           isDone
                             ? 'bg-slate-50/50 dark:bg-[#131417] opacity-60'
                             : 'bg-white dark:bg-[#17181B] hover:border-blue-400 shadow-2xs'
@@ -1005,16 +1155,16 @@ export function Dashboard() {
             </RevealCard>
 
             {/* Upcoming Holidays Calendar */}
-            <RevealCard delayMs={200} className="p-5">
+            <RevealCard delayMs={200} className="p-6">
               <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                  <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 font-heading">
                     Upcoming Company Holidays
                   </h3>
                 </div>
-                <Link to="/holidays" className="text-xs text-blue-600 dark:text-blue-400 hover:underline">
-                  View All
+                <Link to="/holidays" className="text-xs text-blue-600 dark:text-blue-400 hover:underline font-medium">
+                  View Calendar
                 </Link>
               </div>
 
@@ -1025,18 +1175,18 @@ export function Dashboard() {
                   {upcomingHolidays.map((hol) => (
                     <div
                       key={hol.id}
-                      className="p-3 rounded-lg bg-slate-50 dark:bg-[#1D1F23] flex items-center justify-between text-xs"
+                      className="p-3.5 rounded-xl bg-slate-50 dark:bg-[#1D1F23] flex items-center justify-between text-xs"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400 font-semibold text-center min-w-[48px]">
-                          <span className="block text-[10px] uppercase font-mono">
+                        <div className="p-2.5 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400 font-semibold text-center min-w-[50px]">
+                          <span className="block text-[10px] uppercase font-mono font-bold">
                             {hol.dayOfWeek.slice(0, 3)}
                           </span>
-                          <span className="text-sm font-bold">{new Date(hol.date).getDate()}</span>
+                          <span className="text-base font-extrabold">{new Date(hol.date).getDate()}</span>
                         </div>
                         <div>
-                          <p className="font-semibold text-slate-900 dark:text-slate-100">{hol.name}</p>
-                          <p className="text-slate-500 text-[11px]">{formatDate(hol.date)}</p>
+                          <p className="font-bold text-slate-900 dark:text-slate-100 text-sm">{hol.name}</p>
+                          <p className="text-slate-500 text-xs mt-0.5">{formatDate(hol.date)}</p>
                         </div>
                       </div>
                       <Badge variant="neutral" size="sm">
@@ -1051,18 +1201,18 @@ export function Dashboard() {
         </>
       )}
 
-      {/* Global Company Announcements Card (Visible across both portals) */}
-      <RevealCard delayMs={240} className="p-5">
+      {/* Global Company Announcements Card */}
+      <RevealCard delayMs={380} className="p-6">
         <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
           <div className="flex items-center gap-2">
             <Megaphone className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 font-heading">
               Company Announcements & Bulletins
             </h3>
           </div>
           <Link
             to="/announcements"
-            className="text-xs font-medium text-blue-600 dark:text-blue-400 hover:underline"
+            className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline"
           >
             All Notices ({announcements.length})
           </Link>
@@ -1075,7 +1225,7 @@ export function Dashboard() {
             {announcements.slice(0, 2).map((ann) => (
               <div
                 key={ann.id}
-                className="p-4 rounded-xl border border-slate-100 dark:border-[#202227] bg-slate-50/50 dark:bg-[#131417] text-xs flex flex-col justify-between"
+                className="p-5 rounded-2xl border border-slate-100 dark:border-[#202227] bg-slate-50/60 dark:bg-[#131417] text-xs flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-2">
@@ -1086,19 +1236,19 @@ export function Dashboard() {
                       {formatDate(ann.publishedAt)}
                     </span>
                   </div>
-                  <h4 className="font-semibold text-slate-900 dark:text-slate-100 text-sm mb-1">
+                  <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm mb-1.5 font-heading">
                     {ann.title}
                   </h4>
                   <p className="text-slate-600 dark:text-slate-300 line-clamp-2 leading-relaxed">
                     {ann.content}
                   </p>
                 </div>
-                <div className="mt-3 pt-2.5 border-t border-slate-200/50 dark:border-[#202227] flex items-center justify-between text-[11px] text-slate-400">
+                <div className="mt-4 pt-3 border-t border-slate-200/50 dark:border-[#202227] flex items-center justify-between text-[11px] text-slate-400">
                   <span>By {ann.authorName}</span>
                   <button
                     type="button"
                     onClick={() => markAnnouncementRead(ann.id)}
-                    className="text-blue-600 dark:text-blue-400 hover:underline font-medium cursor-pointer"
+                    className="text-blue-600 dark:text-blue-400 hover:underline font-semibold cursor-pointer"
                   >
                     Mark as Read
                   </button>
@@ -1109,7 +1259,7 @@ export function Dashboard() {
         )}
       </RevealCard>
 
-      {/* Quick Apply Leave Modal for Employee */}
+      {/* Quick Apply Leave Modal */}
       <Dialog
         isOpen={showApplyLeaveModal}
         onClose={() => setShowApplyLeaveModal(false)}
@@ -1151,7 +1301,7 @@ export function Dashboard() {
             onChange={(e) => setLeaveReason(e.target.value)}
           />
 
-          <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-[#292B30]">
+          <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-[#292B30]">
             <Button variant="outline" type="button" onClick={() => setShowApplyLeaveModal(false)}>
               Cancel
             </Button>

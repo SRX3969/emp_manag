@@ -33,7 +33,7 @@ interface TopNavProps {
 
 export function TopNav({ onOpenMobileMenu, onOpenSearch }: TopNavProps) {
   const { theme, toggleTheme } = useTheme();
-  const { currentUser, currentOrg, organizations, switchOrganization, createOrganization, role, logout } = useAuth();
+  const { currentUser, currentOrg, organizations, switchOrganization, createOrganization, role, logout, switchRole } = useAuth();
   const { notifications, markNotificationRead, markAllNotificationsRead } = useData();
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
@@ -319,6 +319,37 @@ export function TopNav({ onOpenMobileMenu, onOpenSearch }: TopNavProps) {
                 </div>
 
                 <div className="py-1">
+                  <span className="px-3 py-1 text-[10px] font-mono uppercase tracking-wider text-slate-400 block font-semibold">
+                    Switch Persona / Role
+                  </span>
+                  <div className="grid grid-cols-2 gap-1 px-2 py-1">
+                    {[
+                      { r: 'SUPER_ADMIN' as const, label: 'Super Admin' },
+                      { r: 'HR_ADMIN' as const, label: 'HR Director' },
+                      { r: 'MANAGER' as const, label: 'Manager' },
+                      { r: 'EMPLOYEE' as const, label: 'Employee' },
+                    ].map((item) => (
+                      <button
+                        key={item.r}
+                        onClick={() => {
+                          switchRole(item.r);
+                          setShowProfileMenu(false);
+                        }}
+                        type="button"
+                        className={cn(
+                          'px-2 py-1 rounded text-[11px] font-medium text-left transition-colors cursor-pointer',
+                          role === item.r
+                            ? 'bg-blue-600 text-white font-semibold'
+                            : 'hover:bg-slate-100 dark:hover:bg-[#1D1F23] text-slate-700 dark:text-slate-300'
+                        )}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="py-1">
                   <Link
                     to="/settings/profile"
                     onClick={() => setShowProfileMenu(false)}
@@ -343,7 +374,7 @@ export function TopNav({ onOpenMobileMenu, onOpenSearch }: TopNavProps) {
                       logout();
                       setShowProfileMenu(false);
                     }}
-                    className="flex w-full items-center gap-2 px-3 py-1.5 rounded text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30"
+                    className="flex w-full items-center gap-2 px-3 py-1.5 rounded text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 cursor-pointer"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span>Sign Out</span>
