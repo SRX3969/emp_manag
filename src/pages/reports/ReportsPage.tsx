@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useData } from '@/context/DataContext';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { Button } from '@/components/ui/Button';
 import { StatCard } from '@/components/ui/StatCard';
-import { PageTransition } from '@/components/motion/Motion';
+import { PageTransition, RevealCard } from '@/components/motion/Motion';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import {
   BarChart3,
@@ -15,7 +15,21 @@ import {
   DollarSign,
   TrendingUp,
   FileSpreadsheet,
+  PieChart as PieChartIcon,
 } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  CartesianGrid,
+} from 'recharts';
 
 export function ReportsPage() {
   const { employees, departments, attendanceRecords, leaveRequests, payrollRuns, goals } = useData();
@@ -30,6 +44,35 @@ export function ReportsPage() {
 
   const totalPayrollGross = payrollRuns.reduce((sum, r) => sum + r.totalGross, 0);
   const avgAttendance = 94.2;
+
+  // Chart Data: Department Budget vs Salary Spend
+  const deptBudgetChartData = useMemo(() => {
+    return departments.map((d) => {
+      const deptEmps = employees.filter((e) => e.departmentId === d.id);
+      const totalSal = deptEmps.reduce((sum, e) => sum + e.salary, 0);
+      return {
+        name: d.code || d.name.slice(0, 10),
+        fullName: d.name,
+        AnnualBudget: d.annualBudget,
+        CurrentSalarySpend: totalSal,
+        Headcount: deptEmps.length,
+      };
+    });
+  }, [departments, employees]);
+
+  // Chart Data: Leave Type Distribution
+  const leaveTypeChartData = useMemo(() => {
+    const counts: { [key: string]: number } = {};
+    leaveRequests.forEach((req) => {
+      counts[req.leaveTypeName] = (counts[req.leaveTypeName] || 0) + req.totalDays;
+    });
+    const colors = ['#2563EB', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'];
+    return Object.entries(counts).map(([name, value], idx) => ({
+      name,
+      value,
+      color: colors[idx % colors.length],
+    }));
+  }, [leaveRequests]);
 
   const handleExport = (reportName: string) => {
     let rows: string[][] = [];
@@ -155,45 +198,80 @@ export function ReportsPage() {
 
       {/* Tab: Workforce Demographics */}
       {activeReport === 'workforce' && (
-        <div className="rounded-lg border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] p-6 shadow-sm space-y-6">
-          <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 border-b border-slate-100 dark:border-[#202227] pb-3">
-            Departmental Breakdown & Compensation Statistics
-          </h3>
+        <div className="space-y-6">
+          {/* Department Budget vs Compensation Chart */}
+          <RevealCard delayMs={100} className="p-6">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1">
+              Department Budget Allocation vs Active Salary Commitments
+            </h3>
+            <p className="text-xs text-slate-500 mb-4">
+              Comparison of annual departmental budget cap against annualized salary liabilities
+            </p>
+            <div className="h-64 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={deptBudgetChartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.5} />
+                  <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} tickLine={false} />
+                  <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} tickFormatter={(val) => `$${val / 1000}k`} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#17181B',
+                      borderColor: '#292B30',
+                      borderRadius: '0.5rem',
+                      fontSize: '11px',
+                      color: '#F5F5F5',
+                    }}
+                    formatter={(val: any) => [formatCurrency(Number(val)), 'Amount']}
+                  />
+                  <Legend />
+                  <Bar dataKey="AnnualBudget" fill="#3B82F6" name="Annual Budget" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="CurrentSalarySpend" fill="#10B981" name="Salary Spend" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </RevealCard>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-slate-200 dark:border-[#292B30] text-slate-500 font-semibold uppercase text-[10px]">
-                  <th className="py-2.5">Department</th>
-                  <th className="py-2.5">Headcount</th>
-                  <th className="py-2.5">Annual Budget</th>
-                  <th className="py-2.5">Avg Salary</th>
-                  <th className="py-2.5 text-right">Budget Utilization</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-[#202227]">
-                {departments.map((dept) => {
-                  const deptEmps = employees.filter((e) => e.departmentId === dept.id);
-                  const totalSal = deptEmps.reduce((sum, e) => sum + e.salary, 0);
-                  const avgSal = deptEmps.length > 0 ? Math.round(totalSal / deptEmps.length) : 0;
-                  const utilPct = Math.min(100, Math.round((totalSal / Math.max(1, dept.annualBudget)) * 100));
+          {/* Department Breakdown Table */}
+          <div className="rounded-lg border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] p-6 shadow-sm space-y-4">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 border-b border-slate-100 dark:border-[#202227] pb-3">
+              Departmental Breakdown & Compensation Statistics
+            </h3>
 
-                  return (
-                    <tr key={dept.id} className="text-slate-800 dark:text-slate-200">
-                      <td className="py-3 font-semibold">{dept.name}</td>
-                      <td className="py-3">{deptEmps.length} members</td>
-                      <td className="py-3">{formatCurrency(dept.annualBudget)}</td>
-                      <td className="py-3">{formatCurrency(avgSal)}</td>
-                      <td className="py-3 text-right font-medium">
-                        <span className={utilPct > 85 ? 'text-amber-600' : 'text-emerald-600'}>
-                          {utilPct}%
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-slate-200 dark:border-[#292B30] text-slate-500 font-semibold uppercase text-[10px]">
+                    <th className="py-2.5">Department</th>
+                    <th className="py-2.5">Headcount</th>
+                    <th className="py-2.5">Annual Budget</th>
+                    <th className="py-2.5">Avg Salary</th>
+                    <th className="py-2.5 text-right">Budget Utilization</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-[#202227]">
+                  {departments.map((dept) => {
+                    const deptEmps = employees.filter((e) => e.departmentId === dept.id);
+                    const totalSal = deptEmps.reduce((sum, e) => sum + e.salary, 0);
+                    const avgSal = deptEmps.length > 0 ? Math.round(totalSal / deptEmps.length) : 0;
+                    const utilPct = Math.min(100, Math.round((totalSal / Math.max(1, dept.annualBudget)) * 100));
+
+                    return (
+                      <tr key={dept.id} className="text-slate-800 dark:text-slate-200">
+                        <td className="py-3 font-semibold">{dept.name}</td>
+                        <td className="py-3">{deptEmps.length} members</td>
+                        <td className="py-3">{formatCurrency(dept.annualBudget)}</td>
+                        <td className="py-3">{formatCurrency(avgSal)}</td>
+                        <td className="py-3 text-right font-medium">
+                          <span className={utilPct > 85 ? 'text-amber-600' : 'text-emerald-600'}>
+                            {utilPct}%
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       )}
@@ -228,25 +306,66 @@ export function ReportsPage() {
 
       {/* Tab: Leave */}
       {activeReport === 'leave' && (
-        <div className="rounded-lg border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] p-6 shadow-sm space-y-4">
-          <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 border-b border-slate-100 dark:border-[#202227] pb-3">
-            Leave Utilization Roster
-          </h3>
-          <div className="divide-y divide-slate-100 dark:divide-[#202227] text-xs">
-            {leaveRequests.map((l) => (
-              <div key={l.id} className="py-2.5 flex items-center justify-between">
-                <div>
-                  <span className="font-semibold text-slate-900 dark:text-slate-100">
-                    {l.employeeName}
-                  </span>
-                  <span className="text-slate-400 ml-2">({l.leaveTypeName})</span>
-                  <p className="text-[11px] text-slate-500 mt-0.5">
-                    {formatDate(l.startDate)} - {formatDate(l.endDate)} ({l.totalDays}d) · {l.reason}
-                  </p>
-                </div>
-                <span className="font-bold text-slate-800 dark:text-slate-200">{l.status}</span>
+        <div className="space-y-6">
+          {leaveTypeChartData.length > 0 && (
+            <RevealCard delayMs={100} className="p-6">
+              <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1">
+                Leave Days Utilized by Category
+              </h3>
+              <p className="text-xs text-slate-500 mb-4">
+                Total aggregate days requested across all organization staff
+              </p>
+              <div className="h-60 w-full flex items-center justify-center">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={leaveTypeChartData}
+                      innerRadius={45}
+                      outerRadius={75}
+                      paddingAngle={4}
+                      dataKey="value"
+                    >
+                      {leaveTypeChartData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#17181B',
+                        borderColor: '#292B30',
+                        borderRadius: '0.5rem',
+                        fontSize: '11px',
+                        color: '#F5F5F5',
+                      }}
+                      formatter={(val: any) => [`${val} Days`, 'Days Requested']}
+                    />
+                    <Legend />
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
-            ))}
+            </RevealCard>
+          )}
+
+          <div className="rounded-lg border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] p-6 shadow-sm space-y-4">
+            <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 border-b border-slate-100 dark:border-[#202227] pb-3">
+              Leave Utilization Roster
+            </h3>
+            <div className="divide-y divide-slate-100 dark:divide-[#202227] text-xs">
+              {leaveRequests.map((l) => (
+                <div key={l.id} className="py-2.5 flex items-center justify-between">
+                  <div>
+                    <span className="font-semibold text-slate-900 dark:text-slate-100">
+                      {l.employeeName}
+                    </span>
+                    <span className="text-slate-400 ml-2">({l.leaveTypeName})</span>
+                    <p className="text-[11px] text-slate-500 mt-0.5">
+                      {formatDate(l.startDate)} - {formatDate(l.endDate)} ({l.totalDays}d) · {l.reason}
+                    </p>
+                  </div>
+                  <span className="font-bold text-slate-800 dark:text-slate-200">{l.status}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}

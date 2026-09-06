@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useData } from '@/context/DataContext';
 import { StatCard } from '@/components/ui/StatCard';
@@ -35,8 +35,25 @@ import {
   Download,
   Activity,
   ChevronRight,
+  PieChart as PieChartIcon,
+  BarChart2,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import {
+  ResponsiveContainer,
+  AreaChart,
+  Area,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+  CartesianGrid,
+} from 'recharts';
 
 export function Dashboard() {
   const { currentUser, role, currentOrg } = useAuth();
@@ -66,6 +83,7 @@ export function Dashboard() {
   const [currentTime, setCurrentTime] = useState<string>('');
   const [currentDateStr, setCurrentDateStr] = useState<string>('');
   const [clockInMode, setClockInMode] = useState<'On-site' | 'Remote' | 'Hybrid'>('On-site');
+  const [deptChartType, setDeptChartType] = useState<'donut' | 'bar'>('donut');
 
   // Quick Apply Leave modal state
   const [showApplyLeaveModal, setShowApplyLeaveModal] = useState(false);
@@ -130,18 +148,79 @@ export function Dashboard() {
   const pendingLeaves = leaveRequests.filter((r) => r.status === 'PENDING');
 
   // Genuine Department Headcount Breakdown
-  const departmentBreakdown = departments.map((dept) => {
-    const count = employees.filter((e) => e.departmentId === dept.id && e.status !== 'INACTIVE').length;
-    const pct = totalEmployees > 0 ? Math.round((count / totalEmployees) * 100) : 0;
-    return {
-      id: dept.id,
-      name: dept.name,
-      code: dept.code,
+  const departmentBreakdown = useMemo(() => {
+    return departments.map((dept) => {
+      const count = employees.filter((e) => e.departmentId === dept.id && e.status !== 'INACTIVE').length;
+      const pct = totalEmployees > 0 ? Math.round((count / totalEmployees) * 100) : 0;
+      return {
+        id: dept.id,
+        name: dept.name,
+        code: dept.code,
+        count,
+        pct,
+        color: dept.colorHex || '#2563EB',
+      };
+    });
+  }, [departments, employees, totalEmployees]);
+
+  // Genuine Chronological Headcount Growth Data for Recharts
+  const headcountTrendData = useMemo(() => {
+    const sorted = [...employees].sort((a, b) => (a.joiningDate || '').localeCompare(b.joiningDate || ''));
+    if (sorted.length === 0) {
+      return [
+        { period: 'Q1', count: 0 },
+        { period: 'Q2', count: 0 },
+        { period: 'Q3', count: 0 },
+        { period: 'Q4', count: 0 },
+      ];
+    }
+    let running = 0;
+    const dateMap = new Map<string, number>();
+    sorted.forEach((e) => {
+      running += 1;
+      const d = e.joiningDate ? new Date(e.joiningDate) : new Date();
+      const monthStr = d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+      dateMap.set(monthStr, running);
+    });
+
+    const points = Array.from(dateMap.entries()).map(([period, count]) => ({
+      period,
       count,
-      pct,
-      color: dept.colorHex || '#2563EB',
-    };
-  });
+    }));
+
+    if (points.length === 1) {
+      return [{ period: 'Initial', count: Math.max(1, Math.floor(points[0].count / 2)) }, ...points];
+    }
+    return points;
+  }, [employees]);
+
+  // Today's Attendance Status Data for Recharts
+  const attendanceStatusChartData = useMemo(() => {
+    const present = todayAttendance.filter((r) => r.status === 'PRESENT').length;
+    const late = todayAttendance.filter((r) => r.status === 'LATE').length;
+    const wfh = todayAttendance.filter((r) => r.status === 'WORK_FROM_HOME').length;
+    const onLeave = approvedLeavesToday || onLeaveCount;
+    const absent = Math.max(0, totalEmployees - (present + late + wfh + onLeave));
+
+    return [
+      { name: 'Present', count: present, fill: '#10B981' },
+      { name: 'Late', count: late, fill: '#F59E0B' },
+      { name: 'WFH', count: wfh, fill: '#3B82F6' },
+      { name: 'On Leave', count: onLeave, fill: '#8B5CF6' },
+      { name: 'Absent', count: absent, fill: '#EF4444' },
+    ];
+  }, [todayAttendance, approvedLeavesToday, onLeaveCount, totalEmployees]);
+
+  // Department Pie Data
+  const deptPieData = useMemo(() => {
+    return departmentBreakdown
+      .filter((d) => d.count > 0)
+      .map((d) => ({
+        name: d.name,
+        value: d.count,
+        color: d.color,
+      }));
+  }, [departmentBreakdown]);
 
   // Employee-specific dataset
   const myAttendanceToday = attendanceRecords.find(
@@ -253,10 +332,185 @@ export function Dashboard() {
             />
           </div>
 
-          {/* Middle Row: Pending Approvals & Dynamic Department Distribution */}
+          {/* Real Recharts Analytics Visualizations */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Chart 1: Headcount Growth Velocity */}
+            <RevealCard delayMs={180} className="lg:col-span-2 p-5 flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-[#202227] pb-2.5">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
+                    <TrendingUp className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                      Workforce Headcount Growth Velocity
+                    </h3>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      Cumulative headcount trajectory across onboarding milestones
+                    </p>
+                  </div>
+                </div>
+                <Badge variant="info" size="sm">
+                  {totalEmployees} Total Staff
+                </Badge>
+              </div>
+
+              <div className="h-64 w-full pt-2">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={headcountTrendData} margin={{ top: 10, right: 15, left: -20, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="headcountGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#2563EB" stopOpacity={0.35} />
+                        <stop offset="95%" stopColor="#2563EB" stopOpacity={0.0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.5} />
+                    <XAxis
+                      dataKey="period"
+                      stroke="#94a3b8"
+                      fontSize={11}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      stroke="#94a3b8"
+                      fontSize={11}
+                      allowDecimals={false}
+                      tickLine={false}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: '#17181B',
+                        borderColor: '#292B30',
+                        borderRadius: '0.5rem',
+                        fontSize: '12px',
+                        color: '#F5F5F5',
+                      }}
+                      formatter={(val: any) => [`${val} Employees`, 'Headcount']}
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="count"
+                      stroke="#2563EB"
+                      strokeWidth={2.5}
+                      fillOpacity={1}
+                      fill="url(#headcountGradient)"
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </RevealCard>
+
+            {/* Chart 2: Department Distribution Donut / Attendance Breakdown */}
+            <RevealCard delayMs={220} className="p-5 flex flex-col justify-between">
+              <div className="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-[#202227] pb-2.5">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-md bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400">
+                    <PieChartIcon className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                      Department Share
+                    </h3>
+                    <p className="text-[11px] text-slate-500">
+                      Staff distribution by division
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => setDeptChartType('donut')}
+                    className={`p-1 rounded cursor-pointer transition-colors ${
+                      deptChartType === 'donut'
+                        ? 'bg-blue-600 text-white'
+                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                    }`}
+                    title="Donut view"
+                  >
+                    <PieChartIcon className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDeptChartType('bar')}
+                    className={`p-1 rounded cursor-pointer transition-colors ${
+                      deptChartType === 'bar'
+                        ? 'bg-blue-600 text-white'
+                        : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+                    }`}
+                    title="Attendance status bar view"
+                  >
+                    <BarChart2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              <div className="h-64 w-full flex items-center justify-center">
+                {deptChartType === 'donut' ? (
+                  deptPieData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={deptPieData}
+                          innerRadius={50}
+                          outerRadius={80}
+                          paddingAngle={3}
+                          dataKey="value"
+                        >
+                          {deptPieData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip
+                          contentStyle={{
+                            backgroundColor: '#17181B',
+                            borderColor: '#292B30',
+                            borderRadius: '0.5rem',
+                            fontSize: '11px',
+                            color: '#F5F5F5',
+                          }}
+                          formatter={(val: any, name: any) => [`${val} staff`, name]}
+                        />
+                        <Legend
+                          formatter={(value) => <span className="text-[10px] text-slate-600 dark:text-slate-300 font-medium">{value}</span>}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <p className="text-xs text-slate-400 text-center">No department records</p>
+                  )
+                ) : (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={attendanceStatusChartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.5} />
+                      <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} tickLine={false} />
+                      <YAxis stroke="#94a3b8" fontSize={10} allowDecimals={false} tickLine={false} />
+                      <Tooltip
+                        contentStyle={{
+                          backgroundColor: '#17181B',
+                          borderColor: '#292B30',
+                          borderRadius: '0.5rem',
+                          fontSize: '11px',
+                          color: '#F5F5F5',
+                        }}
+                        formatter={(val: any) => [`${val} Employees`, 'Count']}
+                      />
+                      <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                        {attendanceStatusChartData.map((entry, index) => (
+                          <Cell key={`bar-${index}`} fill={entry.fill} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
+              </div>
+            </RevealCard>
+          </div>
+
+          {/* Middle Row: Pending Approvals & Dynamic Department Distribution List */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Pending Approvals Queue */}
-            <RevealCard delayMs={200} className="lg:col-span-2 p-5">
+            <RevealCard delayMs={240} className="lg:col-span-2 p-5">
               <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
                 <div className="flex items-center gap-2">
                   <div className="p-1.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
@@ -337,14 +591,14 @@ export function Dashboard() {
             </RevealCard>
 
             {/* Real Department Headcount Distribution */}
-            <RevealCard delayMs={240} className="p-5">
+            <RevealCard delayMs={260} className="p-5">
               <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
                 <div className="flex items-center gap-2">
                   <div className="p-1.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
                     <Building2 className="w-4 h-4" />
                   </div>
                   <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                    Department Headcount
+                    Department Roster
                   </h3>
                 </div>
                 <Link

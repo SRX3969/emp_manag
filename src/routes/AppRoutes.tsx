@@ -25,6 +25,7 @@ import { AuditLogsPage } from '@/pages/audit/AuditLogsPage';
 import { NotificationsPage } from '@/pages/notifications/NotificationsPage';
 import { LoginPage } from '@/pages/auth/LoginPage';
 import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage';
+import { LandingPage } from '@/pages/landing/LandingPage';
 
 function ProtectedRoute() {
   const { isAuthenticated } = useAuth();
@@ -37,7 +38,8 @@ function ProtectedRoute() {
 export function AppRoutes() {
   return (
     <Routes>
-      {/* Public Authentication */}
+      {/* Public Landing & Authentication */}
+      <Route path="/landing" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 

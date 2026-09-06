@@ -252,3 +252,21 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Print Styles for Payslips & Reports */
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+  }
+  aside, nav, header, .no-print, button {
+    display: none !important;
+  }
+  .print-clean {
+    box-shadow: none !important;
+    border: 1px solid #e2e8f0 !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+}
+
