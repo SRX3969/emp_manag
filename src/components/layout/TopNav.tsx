@@ -63,12 +63,12 @@ export function TopNav({ onOpenMobileMenu, onOpenSearch }: TopNavProps) {
   };
 
   return (
-    <header className="sticky top-0 z-20 flex h-14 w-full items-center justify-between border-b border-slate-200 bg-white/95 px-4 backdrop-blur-sm dark:border-[#292B30] dark:bg-[#17181B]/95 select-none">
+    <header className="sticky top-0 z-20 flex h-14 w-full items-center justify-between border-b border-[#E8E8E5] bg-[#FAFAF9]/95 px-4 backdrop-blur-xs dark:border-[#242427] dark:bg-[#0B0B0C]/95 select-none">
       {/* Left: Mobile Toggle & Organization Dropdown */}
       <div className="flex items-center gap-3">
         <button
           onClick={onOpenMobileMenu}
-          className="lg:hidden p-1.5 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-[#1D1F23]"
+          className="lg:hidden p-1.5 rounded-md text-[#6B6B6B] hover:bg-[#E8E8E5]/50 hover:text-[#111111] dark:text-[#A1A1AA] dark:hover:bg-[#18181B]"
           aria-label="Open mobile menu"
         >
           <Menu className="w-5 h-5" />
@@ -82,29 +82,29 @@ export function TopNav({ onOpenMobileMenu, onOpenSearch }: TopNavProps) {
               setShowNotifications(false);
               setShowProfileMenu(false);
             }}
-            className="flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-slate-200 bg-slate-50/80 hover:bg-slate-100 dark:border-[#292B30] dark:bg-[#131417] dark:hover:bg-[#1D1F23] transition-colors cursor-pointer text-xs"
+            className="flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-[#E8E8E5] bg-white hover:border-[#D1D1CD] dark:border-[#242427] dark:bg-[#111113] dark:hover:border-[#38383C] transition-colors cursor-pointer text-xs"
           >
-            <Building2 className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400 shrink-0" />
-            <span className="font-semibold text-slate-900 dark:text-slate-100 max-w-[150px] sm:max-w-[200px] truncate">
+            <Building2 className="w-3.5 h-3.5 text-[#5146E5] dark:text-[#6366F1] shrink-0" />
+            <span className="font-semibold text-[#111111] dark:text-[#F5F5F5] max-w-[150px] sm:max-w-[200px] truncate">
               {currentOrg.name}
             </span>
             {currentOrg.isDemo ? (
-              <span className="px-1.5 py-0.2 rounded bg-amber-100 text-amber-800 dark:bg-amber-950/50 dark:text-amber-300 text-[10px] font-medium border border-amber-300 dark:border-amber-800">
+              <span className="px-1.5 py-0.2 rounded bg-amber-50 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300 text-[10px] font-medium border border-amber-200 dark:border-amber-800/50">
                 Demo
               </span>
             ) : (
-              <span className="px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950/50 dark:text-emerald-300 text-[10px] font-medium border border-emerald-300 dark:border-emerald-800">
-                Live Org
+              <span className="px-1.5 py-0.2 rounded bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 text-[10px] font-medium border border-emerald-200 dark:border-emerald-800/50">
+                Live
               </span>
             )}
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            <ChevronDown className="w-3.5 h-3.5 text-[#929292] shrink-0" />
           </button>
 
           {showOrgMenu && (
             <>
               <div className="fixed inset-0 z-30" onClick={() => setShowOrgMenu(false)} />
-              <div className="absolute left-0 mt-2 w-72 rounded-lg bg-white dark:bg-[#17181B] border border-slate-200 dark:border-[#292B30] shadow-xl z-40 p-1 text-xs divide-y divide-slate-100 dark:divide-[#202227] animate-in zoom-in-95 duration-100">
-                <div className="px-3 py-2 text-slate-400 dark:text-slate-500 font-mono text-[10px] uppercase tracking-wider font-semibold">
+              <div className="absolute left-0 mt-2 w-72 rounded-lg bg-white dark:bg-[#111113] border border-[#E8E8E5] dark:border-[#242427] shadow-lg z-40 p-1 text-xs divide-y divide-[#E8E8E5] dark:divide-[#242427] animate-in zoom-in-95 duration-100">
+                <div className="px-3 py-2 text-[#929292] dark:text-[#71717A] font-mono text-[10px] uppercase tracking-wider font-semibold">
                   Select Organization
                 </div>
 
@@ -121,17 +121,17 @@ export function TopNav({ onOpenMobileMenu, onOpenSearch }: TopNavProps) {
                         className={cn(
                           'flex w-full items-center justify-between px-3 py-2 rounded text-left transition-colors',
                           isSelected
-                            ? 'bg-blue-50 text-blue-900 font-semibold dark:bg-blue-950/40 dark:text-blue-200'
-                            : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-[#1D1F23]'
+                            ? 'bg-[#EEF2FF] text-[#3730A3] font-semibold dark:bg-[#1E1B4B] dark:text-[#C7D2FE]'
+                            : 'text-[#111111] dark:text-[#F5F5F5] hover:bg-[#FAFAF9] dark:hover:bg-[#18181B]'
                         )}
                       >
                         <div className="flex flex-col truncate pr-2">
                           <span className="truncate">{org.name}</span>
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500 font-normal">
-                            {org.isDemo ? 'Preloaded Demo Data' : 'Production Zero State'}
+                          <span className="text-[10px] text-[#6B6B6B] dark:text-[#A1A1AA] font-normal">
+                            {org.isDemo ? 'Preloaded Demo Data' : 'Production Workspace'}
                           </span>
                         </div>
-                        {isSelected && <Check className="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" />}
+                        {isSelected && <Check className="w-4 h-4 text-[#5146E5] dark:text-[#6366F1] shrink-0" />}
                       </button>
                     );
                   })}
@@ -143,7 +143,7 @@ export function TopNav({ onOpenMobileMenu, onOpenSearch }: TopNavProps) {
                       setShowNewOrgModal(true);
                       setShowOrgMenu(false);
                     }}
-                    className="flex w-full items-center gap-2 px-3 py-2 rounded text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/30 transition-colors font-medium"
+                    className="flex w-full items-center gap-2 px-3 py-2 rounded text-[#5146E5] dark:text-[#6366F1] hover:bg-[#EEF2FF] dark:hover:bg-[#1E1B4B]/40 transition-colors font-medium cursor-pointer"
                   >
                     <PlusCircle className="w-3.5 h-3.5" />
                     <span>Create New Organization</span>
@@ -155,10 +155,10 @@ export function TopNav({ onOpenMobileMenu, onOpenSearch }: TopNavProps) {
         </div>
 
         {/* Page Breadcrumb */}
-        <div className="hidden md:flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-          <span className="text-slate-300 dark:text-slate-700">/</span>
-          <span className="capitalize text-slate-600 dark:text-slate-300 font-medium">
-            {location.pathname === '/' ? 'Dashboard' : location.pathname.split('/')[1]?.replace('-', ' ')}
+        <div className="hidden md:flex items-center gap-2 text-xs text-[#6B6B6B] dark:text-[#A1A1AA]">
+          <span className="text-[#E8E8E5] dark:text-[#242427]">/</span>
+          <span className="capitalize text-[#111111] dark:text-[#F5F5F5] font-medium">
+            {location.pathname === '/' ? 'Overview' : location.pathname.split('/')[1]?.replace('-', ' ')}
           </span>
         </div>
       </div>
@@ -167,16 +167,16 @@ export function TopNav({ onOpenMobileMenu, onOpenSearch }: TopNavProps) {
       <div className="flex-1 max-w-md mx-4">
         <button
           onClick={onOpenSearch}
-          className="flex w-full items-center justify-between h-8.5 rounded-md border border-slate-200 bg-slate-50 px-3 text-xs text-slate-500 hover:border-slate-300 hover:bg-white dark:border-[#292B30] dark:bg-[#101113] dark:text-slate-400 dark:hover:border-slate-700 transition-all cursor-pointer shadow-2xs"
+          className="flex w-full items-center justify-between h-8.5 rounded-lg border border-[#E8E8E5] bg-white px-3 text-xs text-[#6B6B6B] hover:border-[#D1D1CD] dark:border-[#242427] dark:bg-[#111113] dark:text-[#A1A1AA] dark:hover:border-[#38383C] transition-all cursor-pointer shadow-2xs"
         >
           <div className="flex items-center gap-2">
-            <Search className="w-3.5 h-3.5 text-slate-400" />
-            <span className="hidden sm:inline">Search records, employees, tasks...</span>
+            <Search className="w-3.5 h-3.5 text-[#929292]" />
+            <span className="hidden sm:inline">Search employees, departments, records...</span>
             <span className="sm:hidden">Search...</span>
           </div>
           <div className="flex items-center gap-1">
-            <kbd className="hidden sm:inline-block rounded bg-white px-1.5 py-0.5 text-[10px] font-mono border border-slate-200 text-slate-500 dark:bg-[#1D1F23] dark:border-[#292B30] dark:text-slate-400">
-              Ctrl K
+            <kbd className="hidden sm:inline-block rounded bg-[#FAFAF9] px-1.5 py-0.5 text-[10px] font-mono border border-[#E8E8E5] text-[#6B6B6B] dark:bg-[#18181B] dark:border-[#242427] dark:text-[#A1A1AA]">
+              ⌘K
             </kbd>
           </div>
         </button>
@@ -190,12 +190,12 @@ export function TopNav({ onOpenMobileMenu, onOpenSearch }: TopNavProps) {
           type="button"
           aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 dark:border-[#292B30] dark:hover:bg-[#1D1F23] text-slate-600 dark:text-slate-300 transition-all cursor-pointer shadow-2xs"
+          className="p-1.5 rounded-lg border border-[#E8E8E5] hover:bg-[#FAFAF9] dark:border-[#242427] dark:hover:bg-[#18181B] text-[#6B6B6B] dark:text-[#A1A1AA] transition-all cursor-pointer shadow-2xs"
         >
           {theme === 'dark' ? (
             <Sun className="w-4 h-4 text-amber-400 hover:rotate-45 transition-transform" />
           ) : (
-            <Moon className="w-4 h-4 text-slate-700 hover:-rotate-12 transition-transform" />
+            <Moon className="w-4 h-4 text-[#111111] hover:-rotate-12 transition-transform" />
           )}
         </button>
 
@@ -207,14 +207,14 @@ export function TopNav({ onOpenMobileMenu, onOpenSearch }: TopNavProps) {
               setShowProfileMenu(false);
               setShowOrgMenu(false);
             }}
-            className="relative p-1.5 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-[#1D1F23] dark:hover:text-slate-200 transition-colors"
+            className="relative p-1.5 rounded-lg border border-[#E8E8E5] hover:bg-[#FAFAF9] dark:border-[#242427] dark:hover:bg-[#18181B] text-[#6B6B6B] dark:text-[#A1A1AA] transition-all cursor-pointer shadow-2xs"
             title="Notifications"
           >
             <Bell className="w-4 h-4" />
             {unreadCount > 0 && (
               <span className="absolute top-1 right-1 flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-600"></span>
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#5146E5] opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-[#5146E5]"></span>
               </span>
             )}
           </button>
@@ -222,24 +222,24 @@ export function TopNav({ onOpenMobileMenu, onOpenSearch }: TopNavProps) {
           {showNotifications && (
             <>
               <div className="fixed inset-0 z-30" onClick={() => setShowNotifications(false)} />
-              <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-lg bg-white dark:bg-[#17181B] border border-slate-200 dark:border-[#292B30] shadow-xl z-40 overflow-hidden animate-in zoom-in-95 duration-100">
-                <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 dark:border-[#202227] bg-slate-50/50 dark:bg-[#131417]">
+              <div className="absolute right-0 mt-2 w-80 sm:w-96 rounded-xl bg-white dark:bg-[#111113] border border-[#E8E8E5] dark:border-[#242427] shadow-xl z-40 overflow-hidden animate-in zoom-in-95 duration-100">
+                <div className="flex items-center justify-between px-4 py-3 border-b border-[#E8E8E5] dark:border-[#242427] bg-[#FAFAF9] dark:bg-[#18181B]">
                   <div className="flex items-center gap-2">
-                    <h4 className="text-xs font-semibold text-slate-900 dark:text-slate-100">
+                    <h4 className="text-xs font-semibold text-[#111111] dark:text-[#F5F5F5]">
                       Notifications
                     </h4>
                     {unreadCount > 0 && (
-                      <Badge variant="info" size="sm">
+                      <span className="px-1.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#EEF2FF] text-[#5146E5] dark:bg-[#1E1B4B] dark:text-[#C7D2FE]">
                         {unreadCount} new
-                      </Badge>
+                      </span>
                     )}
                   </div>
                   {unreadCount > 0 && (
                     <button
                       onClick={markAllNotificationsRead}
-                      className="text-[11px] text-blue-600 hover:underline dark:text-blue-400"
+                      className="text-[11px] text-[#5146E5] hover:underline dark:text-[#6366F1] cursor-pointer font-medium"
                     >
-                      Mark all as read
+                      Mark all read
                     </button>
                   )}
                 </div>

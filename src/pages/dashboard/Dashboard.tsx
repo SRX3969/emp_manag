@@ -314,35 +314,31 @@ export function Dashboard() {
       {/* ========================================================= */}
       {role !== 'EMPLOYEE' ? (
         <>
-          {/* Fresh Hero Command Banner */}
-          <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-br from-white via-slate-50 to-blue-50/40 p-6 sm:p-8 shadow-sm dark:border-[#292B30] dark:from-[#17181B] dark:via-[#151619] dark:to-[#121A2E]/50">
-            {/* Luminous Glow Spots */}
-            <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl dark:bg-blue-600/15" />
-            <div className="pointer-events-none absolute -bottom-20 left-1/3 h-48 w-48 rounded-full bg-indigo-500/10 blur-2xl dark:bg-indigo-600/10" />
-
-            <div className="relative z-10 flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-              <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 rounded-full border border-blue-200/80 bg-blue-50/80 px-3 py-1 text-xs font-semibold text-blue-700 backdrop-blur-xs dark:border-blue-900/50 dark:bg-blue-950/50 dark:text-blue-300">
-                  <span className="relative flex h-2 w-2">
+          {/* Editorial Header Banner */}
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--border-color)] bg-[var(--surface)] p-6 sm:p-7 shadow-xs">
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+              <div className="space-y-1.5">
+                <div className="inline-flex items-center gap-2 rounded-md border border-[var(--border-color)] bg-[var(--surface-elevated)] px-2.5 py-1 text-[11px] font-medium text-[var(--text-secondary)]">
+                  <span className="relative flex h-1.5 w-1.5">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+                    <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                   </span>
-                  <span>{currentOrg.name}</span>
-                  <span className="text-slate-400 dark:text-slate-500">·</span>
-                  <span className="font-mono text-[11px] font-normal">Realtime Database Synced</span>
+                  <span className="font-semibold text-[var(--text-primary)]">{currentOrg.name}</span>
+                  <span className="text-[var(--text-muted)]">/</span>
+                  <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-muted)]">Live Database Synced</span>
                 </div>
 
-                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold font-heading text-slate-900 dark:text-slate-100 tracking-tight">
-                  {greeting}, <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">{currentUser.name}</span>
+                <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[var(--text-primary)] font-heading">
+                  {greeting}, {currentUser.name}
                 </h1>
 
-                <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-2xl font-normal">
-                  Workforce intelligence overview for <span className="font-semibold text-slate-900 dark:text-slate-200">{currentDateStr || 'today'}</span>. {presentToday} of {totalEmployees} team members active today.
+                <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-2xl font-normal leading-relaxed">
+                  Here's what's happening across your organization for <span className="font-medium text-[var(--text-primary)]">{currentDateStr || 'today'}</span>. {presentToday} of {totalEmployees} team members active today.
                 </p>
               </div>
 
-              {/* Action Buttons Matrix */}
-              <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+              {/* Action Matrix */}
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
                 <Link to="/reports">
                   <Button variant="outline" size="sm" leftIcon={<FileText className="w-3.5 h-3.5" />}>
                     Reports
@@ -360,8 +356,7 @@ export function Dashboard() {
                     <Button
                       variant="primary"
                       size="sm"
-                      className="shadow-sm shadow-blue-500/20"
-                      leftIcon={<UserPlus className="w-4 h-4" />}
+                      leftIcon={<UserPlus className="w-3.5 h-3.5" />}
                     >
                       Add Employee
                     </Button>
@@ -370,23 +365,23 @@ export function Dashboard() {
               </div>
             </div>
 
-            {/* Quick Status Ticker Bar */}
-            <div className="mt-6 pt-5 border-t border-slate-200/60 dark:border-[#24272E] grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-              <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span>Attendance Rate: <strong className="text-slate-900 dark:text-white font-bold">{attendanceRate}%</strong></span>
+            {/* Micro Metrics Strip */}
+            <div className="mt-5 pt-4 border-t border-[var(--border-color)] grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div className="flex items-center gap-2 text-[var(--text-secondary)]">
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span>Attendance Rate: <strong className="text-[var(--text-primary)] font-medium">{attendanceRate}%</strong></span>
               </div>
-              <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                <div className="w-2 h-2 rounded-full bg-blue-500" />
-                <span>Active Personnel: <strong className="text-slate-900 dark:text-white font-bold">{activeEmployees}</strong></span>
+              <div className="flex items-center gap-2 text-[var(--text-secondary)]">
+                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                <span>Active Personnel: <strong className="text-[var(--text-primary)] font-medium">{activeEmployees}</strong></span>
               </div>
-              <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                <div className="w-2 h-2 rounded-full bg-amber-500" />
-                <span>Pending Reviews: <strong className="text-slate-900 dark:text-white font-bold">{pendingLeaves.length}</strong></span>
+              <div className="flex items-center gap-2 text-[var(--text-secondary)]">
+                <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                <span>Pending Reviews: <strong className="text-[var(--text-primary)] font-medium">{pendingLeaves.length}</strong></span>
               </div>
-              <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
-                <div className="w-2 h-2 rounded-full bg-purple-500" />
-                <span>Active Base: <strong className="text-slate-900 dark:text-white font-bold">{formatCurrency(totalMonthlyPayrollLiability)}</strong></span>
+              <div className="flex items-center gap-2 text-[var(--text-secondary)]">
+                <div className="w-1.5 h-1.5 rounded-full bg-purple-500" />
+                <span>Active Base: <strong className="text-[var(--text-primary)] font-medium">{formatCurrency(totalMonthlyPayrollLiability)}</strong></span>
               </div>
             </div>
           </div>
@@ -397,8 +392,7 @@ export function Dashboard() {
               title="Total Workforce"
               value={totalEmployees}
               subtitle={`${activeEmployees} Active · ${probationCount} Probation`}
-              icon={<Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />}
-              accentColor="blue"
+              icon={<Users className="w-5 h-5 text-[var(--accent)]" />}
               change={{ value: `${totalEmployees} staff registered`, trend: 'up' }}
               delayMs={40}
             />
@@ -406,8 +400,7 @@ export function Dashboard() {
               title="Present Today"
               value={presentToday}
               subtitle={`${attendanceRate}% attendance rate (${wfhCount} Remote)`}
-              icon={<UserCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />}
-              accentColor="emerald"
+              icon={<UserCheck className="w-5 h-5 text-emerald-500" />}
               change={{ value: `${presentToday}/${totalEmployees} online`, trend: 'up' }}
               delayMs={80}
             />
@@ -415,8 +408,7 @@ export function Dashboard() {
               title="On Leave Today"
               value={approvedLeavesToday || onLeaveCount}
               subtitle={`${pendingLeaves.length} pending management review`}
-              icon={<CalendarOff className="w-5 h-5 text-amber-600 dark:text-amber-400" />}
-              accentColor="amber"
+              icon={<CalendarOff className="w-5 h-5 text-amber-500" />}
               change={{ value: `${pendingLeaves.length} to review`, trend: pendingLeaves.length > 0 ? 'down' : 'neutral' }}
               delayMs={120}
             />
@@ -424,8 +416,7 @@ export function Dashboard() {
               title="Monthly Payroll"
               value={formatCurrency(totalMonthlyPayrollLiability)}
               subtitle={`Active payroll base across ${departments.length} departments`}
-              icon={<DollarSign className="w-5 h-5 text-purple-600 dark:text-purple-400" />}
-              accentColor="purple"
+              icon={<DollarSign className="w-5 h-5 text-purple-500" />}
               change={{ value: '100% On-time', trend: 'up' }}
               delayMs={160}
             />
@@ -880,7 +871,7 @@ export function Dashboard() {
         /* ========================================================= */
         <>
           {/* Employee Workspace Hero Card */}
-          <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 bg-gradient-to-br from-white via-slate-50 to-emerald-50/30 p-6 sm:p-8 shadow-sm dark:border-[#292B30] dark:from-[#17181B] dark:via-[#151619] dark:to-[#0C1F1D]/40">
+          <div className="relative overflow-hidden rounded-2xl border border-[var(--border-color)] bg-[var(--surface)] p-6 sm:p-7 shadow-xs">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div className="flex items-center gap-4">
                 <Avatar
@@ -891,16 +882,16 @@ export function Dashboard() {
                 />
                 <div className="space-y-1">
                   <div className="flex items-center gap-2.5">
-                    <h1 className="text-2xl font-extrabold font-heading text-slate-900 dark:text-slate-100">
+                    <h1 className="text-2xl font-semibold tracking-tight text-[var(--text-primary)] font-heading">
                       {greeting}, {currentUser.name}
                     </h1>
                     <Badge variant="success" size="sm">
-                      Employee Self-Service
+                      Staff Portal
                     </Badge>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">
-                    <strong className="text-slate-800 dark:text-slate-200">{currentEmpRecord?.designation || 'Staff Member'}</strong> · {currentEmpRecord?.departmentName || 'Operations'} · ID:{' '}
-                    <span className="font-mono font-bold text-blue-600 dark:text-blue-400">{currentEmpRecord?.employeeCode || 'EMP-004'}</span>
+                  <p className="text-xs text-[var(--text-secondary)]">
+                    <strong className="text-[var(--text-primary)] font-medium">{currentEmpRecord?.designation || 'Staff Member'}</strong> · {currentEmpRecord?.departmentName || 'Operations'} · ID:{' '}
+                    <span className="font-mono font-medium text-[var(--accent)]">{currentEmpRecord?.employeeCode || 'EMP-004'}</span>
                   </p>
                 </div>
               </div>

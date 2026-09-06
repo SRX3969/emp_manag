@@ -4,19 +4,19 @@
 
 @layer base {
   :root {
-    --bg-app: #F8F9FA;
+    --bg-app: #FAFAF9;
     --surface: #FFFFFF;
-    --surface-elevated: #F1F3F5;
-    --text-primary: #171717;
-    --text-secondary: #6B7280;
-    --text-muted: #9CA3AF;
-    --border-color: #E5E7EB;
-    --border-subtle: #F3F4F6;
+    --surface-elevated: #F5F5F4;
+    --text-primary: #111111;
+    --text-secondary: #6B6B6B;
+    --text-muted: #929292;
+    --border-color: #E8E8E5;
+    --border-subtle: #F0F0EE;
     
-    --accent: #2563EB;
-    --accent-hover: #1D4ED8;
-    --accent-subtle: #EFF6FF;
-    --accent-text: #1E40AF;
+    --accent: #5146E5;
+    --accent-hover: #4338CA;
+    --accent-subtle: #EEF2FF;
+    --accent-text: #3730A3;
 
     --status-success: #10B981;
     --status-success-bg: #ECFDF5;
@@ -30,27 +30,27 @@
     --status-danger-bg: #FEF2F2;
     --status-danger-text: #991B1B;
 
-    --status-info: #3B82F6;
-    --status-info-bg: #EFF6FF;
-    --status-info-text: #1E40AF;
+    --status-info: #5146E5;
+    --status-info-bg: #EEF2FF;
+    --status-info-text: #3730A3;
 
     --ease-out-enterprise: cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .dark {
-    --bg-app: #101113;
-    --surface: #17181B;
-    --surface-elevated: #1D1F23;
+    --bg-app: #0B0B0C;
+    --surface: #111113;
+    --surface-elevated: #18181B;
     --text-primary: #F5F5F5;
-    --text-secondary: #9CA3AF;
-    --text-muted: #6B7280;
-    --border-color: #292B30;
-    --border-subtle: #202227;
+    --text-secondary: #A1A1AA;
+    --text-muted: #71717A;
+    --border-color: #242427;
+    --border-subtle: #1C1C1F;
 
-    --accent: #3B82F6;
-    --accent-hover: #60A5FA;
-    --accent-subtle: #1E293B;
-    --accent-text: #93C5FD;
+    --accent: #6366F1;
+    --accent-hover: #4F46E5;
+    --accent-subtle: #1E1B4B;
+    --accent-text: #C7D2FE;
 
     --status-success: #10B981;
     --status-success-bg: #064E3B;
@@ -64,9 +64,9 @@
     --status-danger-bg: #7F1D1D;
     --status-danger-text: #FECACA;
 
-    --status-info: #3B82F6;
-    --status-info-bg: #1E3A8A;
-    --status-info-text: #BFDBFE;
+    --status-info: #6366F1;
+    --status-info-bg: #1E1B4B;
+    --status-info-text: #C7D2FE;
   }
 
   * {
@@ -83,8 +83,8 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Manrope', 'Inter', system-ui, sans-serif;
-    letter-spacing: -0.015em;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    letter-spacing: -0.025em;
   }
 }
 
