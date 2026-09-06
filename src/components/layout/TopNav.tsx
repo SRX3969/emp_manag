@@ -187,10 +187,16 @@ export function TopNav({ onOpenMobileMenu, onOpenSearch }: TopNavProps) {
         {/* Theme Toggle */}
         <button
           onClick={toggleTheme}
+          type="button"
+          aria-label={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          className="p-1.5 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-[#1D1F23] dark:hover:text-slate-200 transition-colors"
+          className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 dark:border-[#292B30] dark:hover:bg-[#1D1F23] text-slate-600 dark:text-slate-300 transition-all cursor-pointer shadow-2xs"
         >
-          {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          {theme === 'dark' ? (
+            <Sun className="w-4 h-4 text-amber-400 hover:rotate-45 transition-transform" />
+          ) : (
+            <Moon className="w-4 h-4 text-slate-700 hover:-rotate-12 transition-transform" />
+          )}
         </button>
 
         {/* Notifications Popover */}

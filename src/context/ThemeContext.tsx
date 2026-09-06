@@ -21,24 +21,38 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const root = document.documentElement;
-    let actualTheme: 'light' | 'dark' = 'light';
+    const body = document.body;
+
+    const applyTheme = (current: Theme) => {
+      let actual: 'light' | 'dark' = 'light';
+
+      if (current === 'system') {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        actual = prefersDark ? 'dark' : 'light';
+      } else {
+        actual = current;
+      }
+
+      setResolvedTheme(actual);
+
+      if (actual === 'dark') {
+        root.classList.add('dark');
+        body.classList.add('dark');
+      } else {
+        root.classList.remove('dark');
+        body.classList.remove('dark');
+      }
+    };
+
+    applyTheme(theme);
+    localStorage.setItem('emp_theme', theme);
 
     if (theme === 'system') {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      actualTheme = prefersDark ? 'dark' : 'light';
-    } else {
-      actualTheme = theme;
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = () => applyTheme('system');
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
     }
-
-    setResolvedTheme(actualTheme);
-
-    if (actualTheme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-
-    localStorage.setItem('emp_theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {
