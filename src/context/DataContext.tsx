@@ -46,12 +46,12 @@ export interface CompanySettings {
 }
 
 const defaultDemoSettings: CompanySettings = {
-  companyName: 'Apex Global Technologies Ltd.',
-  companyEmail: 'contact@apexglobal.com',
-  companyPhone: '+1 (555) 019-2834',
-  companyAddress: '450 Lexington Avenue, Floor 18, New York, NY 10017',
-  currency: 'USD',
-  timezone: 'America/New_York (EST)',
+  companyName: 'Apex Global Technologies India Pvt. Ltd.',
+  companyEmail: 'contact@apexglobal.in',
+  companyPhone: '+91 (80) 4129-8900',
+  companyAddress: 'Prestige Tech Park, Outer Ring Road, Bellandur, Bengaluru, Karnataka 560103',
+  currency: 'INR',
+  timezone: 'Asia/Kolkata (IST)',
   workDays: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
   standardWorkHours: 8,
   allowRemoteClockIn: true,
@@ -62,9 +62,12 @@ const defaultDemoSettings: CompanySettings = {
 };
 
 const defaultCleanLeaveTypes: LeaveType[] = [
-  { id: 'lt_1', organizationId: 'org_prod_clean', name: 'Annual / Paid Leave', code: 'AL', totalDaysPerYear: 20, carryForwardAllowed: true, maxCarryForwardDays: 5, isPaid: true, requiresAttachment: false, colorHex: '#2563EB' },
-  { id: 'lt_2', organizationId: 'org_prod_clean', name: 'Sick Leave', code: 'SL', totalDaysPerYear: 12, carryForwardAllowed: false, isPaid: true, requiresAttachment: true, colorHex: '#DC2626' },
-  { id: 'lt_3', organizationId: 'org_prod_clean', name: 'Casual Leave', code: 'CL', totalDaysPerYear: 8, carryForwardAllowed: false, isPaid: true, requiresAttachment: false, colorHex: '#D97706' },
+  { id: 'lt_1', organizationId: 'org_prod_clean', name: 'Privilege / Earned Leave', code: 'PL', totalDaysPerYear: 18, carryForwardAllowed: true, maxCarryForwardDays: 8, isPaid: true, requiresAttachment: false, colorHex: '#2563EB' },
+  { id: 'lt_2', organizationId: 'org_prod_clean', name: 'Casual Leave', code: 'CL', totalDaysPerYear: 12, carryForwardAllowed: false, isPaid: true, requiresAttachment: false, colorHex: '#D97706' },
+  { id: 'lt_3', organizationId: 'org_prod_clean', name: 'Sick / Medical Leave', code: 'SL', totalDaysPerYear: 12, carryForwardAllowed: false, isPaid: true, requiresAttachment: true, colorHex: '#DC2626' },
+  { id: 'lt_4', organizationId: 'org_prod_clean', name: 'Maternity Leave', code: 'ML', totalDaysPerYear: 182, carryForwardAllowed: false, isPaid: true, requiresAttachment: true, colorHex: '#EC4899' },
+  { id: 'lt_5', organizationId: 'org_prod_clean', name: 'Paternity Leave', code: 'PTL', totalDaysPerYear: 15, carryForwardAllowed: false, isPaid: true, requiresAttachment: true, colorHex: '#8B5CF6' },
+  { id: 'lt_6', organizationId: 'org_prod_clean', name: 'Compensatory Off', code: 'COMP', totalDaysPerYear: 10, carryForwardAllowed: false, isPaid: true, requiresAttachment: false, colorHex: '#10B981' },
 ];
 
 interface DataContextType {
@@ -745,7 +748,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         designation: emp.designation,
         departmentName: emp.departmentName,
         bankAccountNumber: emp.bankAccountNumber || '•••• 8921',
-        panNumber: emp.taxIdentificationNumber || 'ABCDE1234F',
+        panNumber: emp.panNumber || emp.taxIdentificationNumber || 'AAAPS1234A',
+        uanNumber: emp.uanNumber || '100982347101',
+        ifscCode: emp.ifscCode || 'HDFC0001234',
         payPeriod: run.payPeriodMonth,
         paymentDate: run.disbursementDate,
         paymentStatus: 'PAID',
@@ -763,7 +768,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         otherDeductions: 0,
         totalDeductions: deductions,
         netPayable: net,
-        currency: emp.currency || 'USD',
+        currency: emp.currency || 'INR',
         generatedAt: new Date().toISOString(),
       };
     });

@@ -477,7 +477,7 @@ export function EmployeeDetail() {
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
               <div className="p-3 rounded bg-slate-50 dark:bg-[#1D1F23]">
-                <span className="text-slate-500">Base Annual Salary</span>
+                <span className="text-slate-500">Base Annual CTC / Salary</span>
                 <p className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-1 font-heading">
                   {formatCurrency(employee.salary)}
                 </p>
@@ -491,8 +491,36 @@ export function EmployeeDetail() {
               <div className="p-3 rounded bg-slate-50 dark:bg-[#1D1F23]">
                 <span className="text-slate-500">Disbursement Currency</span>
                 <p className="text-xl font-bold text-slate-900 dark:text-slate-100 mt-1 font-heading">
-                  {employee.currency} (USD)
+                  {employee.currency === 'USD' ? 'USD ($)' : 'INR (₹)'}
                 </p>
+              </div>
+            </div>
+
+            {/* Statutory & Compliance Details */}
+            <div className="mt-4 pt-4 border-t border-slate-100 dark:border-[#202227] grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div className="p-2.5 rounded border border-slate-100 dark:border-[#202227] bg-slate-50/50 dark:bg-[#18191C]">
+                <span className="text-slate-400 text-[10px] uppercase font-semibold block">Permanent Account (PAN)</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200 font-mono">
+                  {employee.panNumber || employee.taxIdentificationNumber || 'AAAPS1234A'}
+                </span>
+              </div>
+              <div className="p-2.5 rounded border border-slate-100 dark:border-[#202227] bg-slate-50/50 dark:bg-[#18191C]">
+                <span className="text-slate-400 text-[10px] uppercase font-semibold block">Universal Account (UAN / EPF)</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200 font-mono">
+                  {employee.uanNumber || '100982347101'}
+                </span>
+              </div>
+              <div className="p-2.5 rounded border border-slate-100 dark:border-[#202227] bg-slate-50/50 dark:bg-[#18191C]">
+                <span className="text-slate-400 text-[10px] uppercase font-semibold block">Bank IFSC Code</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200 font-mono">
+                  {employee.ifscCode || 'HDFC0001234'}
+                </span>
+              </div>
+              <div className="p-2.5 rounded border border-slate-100 dark:border-[#202227] bg-slate-50/50 dark:bg-[#18191C]">
+                <span className="text-slate-400 text-[10px] uppercase font-semibold block">Bank Account Mask</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200 font-mono">
+                  {employee.bankAccountNumber || '•••• 4819'}
+                </span>
               </div>
             </div>
           </div>

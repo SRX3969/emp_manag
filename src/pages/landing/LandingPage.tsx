@@ -267,7 +267,7 @@ export function LandingPage() {
                   </div>
                   <div className="p-3.5 rounded-lg bg-[var(--surface-elevated)] border border-[var(--border-color)]">
                     <p className="text-[11px] text-[var(--text-muted)] font-medium">Monthly Payroll</p>
-                    <p className="text-xl font-semibold text-purple-600 dark:text-purple-400 mt-1 font-heading">$108,500</p>
+                    <p className="text-xl font-semibold text-purple-600 dark:text-purple-400 mt-1 font-heading">₹1,39,85,500</p>
                     <p className="text-[10px] text-[var(--text-muted)] mt-0.5">100% On-time Disbursed</p>
                   </div>
                 </div>
@@ -291,7 +291,7 @@ export function LandingPage() {
                       09:41:22 AM
                     </span>
                   </div>
-                  <p className="text-xs text-[var(--text-secondary)]">Live Server Synced Time · Geofence Verified</p>
+                  <p className="text-xs text-[var(--text-secondary)]">Live Server Synced Time (IST) · Geofence Verified</p>
                 </div>
               </div>
             )}
@@ -331,7 +331,7 @@ export function LandingPage() {
                     <h3 className="text-sm font-semibold text-[var(--text-primary)]">
                       Multi-Tier Compensation & Itemized Payslips
                     </h3>
-                    <p className="text-xs text-[var(--text-secondary)]">Automated gross-to-net salary calculations with print formatting</p>
+                    <p className="text-xs text-[var(--text-secondary)]">Automated gross-to-net salary calculations with statutory deductions</p>
                   </div>
                   <Badge variant="success" size="sm">Ready to Print</Badge>
                 </div>
@@ -339,18 +339,18 @@ export function LandingPage() {
                   <div className="p-3.5 rounded-lg border border-[var(--border-color)] bg-[var(--surface-elevated)]">
                     <p className="font-semibold text-[var(--text-primary)] mb-2">Earnings Breakdown</p>
                     <div className="space-y-1.5 text-[var(--text-secondary)]">
-                      <div className="flex justify-between"><span>Base Salary</span><span className="font-medium text-[var(--text-primary)]">$12,500.00</span></div>
-                      <div className="flex justify-between"><span>Housing Allowance (HRA)</span><span className="font-medium text-[var(--text-primary)]">$2,500.00</span></div>
-                      <div className="flex justify-between"><span>Special Allowance</span><span className="font-medium text-[var(--text-primary)]">$1,000.00</span></div>
+                      <div className="flex justify-between"><span>Base Salary</span><span className="font-medium text-[var(--text-primary)]">₹1,00,000.00</span></div>
+                      <div className="flex justify-between"><span>Housing Allowance (HRA)</span><span className="font-medium text-[var(--text-primary)]">₹50,000.00</span></div>
+                      <div className="flex justify-between"><span>Special Allowance</span><span className="font-medium text-[var(--text-primary)]">₹70,333.00</span></div>
                     </div>
                   </div>
                   <div className="p-3.5 rounded-lg border border-[var(--border-color)] bg-[var(--surface-elevated)]">
                     <p className="font-semibold text-[var(--text-primary)] mb-2">Statutory Deductions & Net</p>
                     <div className="space-y-1.5 text-[var(--text-secondary)]">
-                      <div className="flex justify-between"><span>Income Tax (TDS)</span><span className="text-red-500 font-medium">-$1,800.00</span></div>
-                      <div className="flex justify-between"><span>Provident Fund / 401(k)</span><span className="text-red-500 font-medium">-$750.00</span></div>
+                      <div className="flex justify-between"><span>Income Tax (TDS / Sec 192)</span><span className="text-red-500 font-medium">-₹26,500.00</span></div>
+                      <div className="flex justify-between"><span>Employee Provident Fund (EPF)</span><span className="text-red-500 font-medium">-₹12,000.00</span></div>
                       <div className="flex justify-between pt-1 border-t border-[var(--border-color)] font-semibold text-[var(--text-primary)]">
-                        <span>Net Take Home</span><span className="text-emerald-600 dark:text-emerald-400 font-bold">$13,450.00</span>
+                        <span>Net Take Home</span><span className="text-emerald-600 dark:text-emerald-400 font-bold">₹1,94,633.00</span>
                       </div>
                     </div>
                   </div>

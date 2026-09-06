@@ -42,17 +42,17 @@ export function RecruitmentPage() {
   const [hireForm, setHireForm] = useState({
     departmentId: departments[0]?.id || 'dept_eng',
     designation: '',
-    salary: 120000,
+    salary: 2400000,
   });
 
   const [jobForm, setJobForm] = useState({
     title: '',
     departmentId: departments[0]?.id || 'dept_eng',
-    location: 'New York, NY (Hybrid)',
+    location: 'Bengaluru, KA (Hybrid)',
     employmentType: 'Full-Time',
     openPositions: 1,
     experienceLevel: 'Senior (4+ years)',
-    salaryRange: '$120,000 - $145,000',
+    salaryRange: '₹24,00,000 - ₹32,00,000 LPA',
     description: '',
   });
 
@@ -283,7 +283,7 @@ export function RecruitmentPage() {
           <div className="grid grid-cols-2 gap-4">
             <Input
               label="Target Salary Range"
-              placeholder="e.g. $130,000 - $160,000"
+              placeholder="e.g. ₹28,00,000 - ₹36,00,000 LPA"
               value={jobForm.salaryRange}
               onChange={(e) => setJobForm({ ...jobForm, salaryRange: e.target.value })}
             />
@@ -339,7 +339,7 @@ export function RecruitmentPage() {
               onChange={(e) => setHireForm({ ...hireForm, designation: e.target.value })}
             />
             <Input
-              label="Agreed Base Annual Salary (USD)"
+              label="Agreed Annual CTC / Salary (₹)"
               type="number"
               required
               value={hireForm.salary}

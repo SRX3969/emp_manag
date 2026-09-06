@@ -111,10 +111,10 @@ export function SettingsPage() {
                 value={companyForm.currency}
                 onChange={(e) => setCompanyForm({ ...companyForm, currency: e.target.value })}
                 options={[
+                  { value: 'INR', label: 'INR (₹) - Indian Rupee' },
                   { value: 'USD', label: 'USD ($) - US Dollar' },
                   { value: 'EUR', label: 'EUR (€) - Euro' },
                   { value: 'GBP', label: 'GBP (£) - British Pound' },
-                  { value: 'INR', label: 'INR (₹) - Indian Rupee' },
                 ]}
               />
               <div className="sm:col-span-2">
@@ -138,10 +138,10 @@ export function SettingsPage() {
             </div>
             <div className="divide-y divide-slate-100 dark:divide-[#202227] text-xs">
               {[
-                { name: 'Rahul Sharma', email: 'rahul.sharma@apexglobal.com', role: 'SUPER_ADMIN', desc: 'Full System Control' },
-                { name: 'Ananya Rao', email: 'ananya.rao@apexglobal.com', role: 'HR_ADMIN', desc: 'HR Operations' },
-                { name: 'Arjun Kumar', email: 'arjun.kumar@apexglobal.com', role: 'MANAGER', desc: 'Engineering Team Lead' },
-                { name: 'Priya Patel', email: 'priya.patel@apexglobal.com', role: 'EMPLOYEE', desc: 'Self Service' },
+                { name: 'Rahul Sharma', email: 'rahul.sharma@apexglobal.in', role: 'SUPER_ADMIN', desc: 'Full System Control' },
+                { name: 'Ananya Rao', email: 'ananya.rao@apexglobal.in', role: 'HR_ADMIN', desc: 'HR Operations' },
+                { name: 'Arjun Kumar', email: 'arjun.kumar@apexglobal.in', role: 'MANAGER', desc: 'Engineering Team Lead' },
+                { name: 'Priya Patel', email: 'priya.patel@apexglobal.in', role: 'EMPLOYEE', desc: 'Self Service' },
               ].map((u) => (
                 <div key={u.email} className="px-6 py-3.5 flex items-center justify-between">
                   <div className="flex items-center gap-3">

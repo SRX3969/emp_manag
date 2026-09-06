@@ -212,7 +212,16 @@ export function ReportsPage() {
                 <BarChart data={deptBudgetChartData} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" opacity={0.5} />
                   <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} tickLine={false} />
-                  <YAxis stroke="#94a3b8" fontSize={11} tickLine={false} tickFormatter={(val) => `$${val / 1000}k`} />
+                  <YAxis
+                    stroke="#94a3b8"
+                    fontSize={11}
+                    tickLine={false}
+                    tickFormatter={(val) =>
+                      val >= 10000000
+                        ? `₹${(val / 10000000).toFixed(1)}Cr`
+                        : `₹${(val / 100000).toFixed(0)}L`
+                    }
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#17181B',

@@ -27,7 +27,10 @@ export function EmployeeEdit() {
     employmentType: (employee?.employmentType || 'FULL_TIME') as EmploymentType,
     workLocation: (employee?.workLocation || 'Hybrid') as 'On-site' | 'Remote' | 'Hybrid',
     status: (employee?.status || 'ACTIVE') as EmployeeStatus,
-    salary: employee?.salary || 95000,
+    salary: employee?.salary || 2400000,
+    panNumber: employee?.panNumber || employee?.taxIdentificationNumber || '',
+    uanNumber: employee?.uanNumber || '',
+    ifscCode: employee?.ifscCode || '',
     address: employee?.address || '',
     city: employee?.city || '',
     country: employee?.country || '',
@@ -65,6 +68,10 @@ export function EmployeeEdit() {
       workLocation: formData.workLocation,
       status: formData.status,
       salary: Number(formData.salary),
+      panNumber: formData.panNumber,
+      taxIdentificationNumber: formData.panNumber,
+      uanNumber: formData.uanNumber,
+      ifscCode: formData.ifscCode,
       address: formData.address,
       city: formData.city,
       country: formData.country,
@@ -176,10 +183,28 @@ export function EmployeeEdit() {
               ]}
             />
             <Input
-              label="Annual Salary (USD)"
+              label="Annual CTC / Salary (₹)"
               type="number"
               value={formData.salary}
               onChange={(e) => setFormData({ ...formData, salary: Number(e.target.value) })}
+            />
+            <Input
+              label="Permanent Account Number (PAN)"
+              value={formData.panNumber}
+              onChange={(e) => setFormData({ ...formData, panNumber: e.target.value.toUpperCase() })}
+              placeholder="e.g. AAAPS1234A"
+            />
+            <Input
+              label="Universal Account Number (UAN / EPF)"
+              value={formData.uanNumber}
+              onChange={(e) => setFormData({ ...formData, uanNumber: e.target.value })}
+              placeholder="e.g. 100982347101"
+            />
+            <Input
+              label="Bank IFSC Code"
+              value={formData.ifscCode}
+              onChange={(e) => setFormData({ ...formData, ifscCode: e.target.value.toUpperCase() })}
+              placeholder="e.g. HDFC0001234"
             />
           </div>
         </div>

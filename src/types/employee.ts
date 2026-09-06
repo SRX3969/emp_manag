@@ -56,6 +56,9 @@ export interface Employee {
   payType: PayType;
   currency: string;
   bankAccountNumber?: string;
+  ifscCode?: string;
+  panNumber?: string;
+  uanNumber?: string;
   taxIdentificationNumber?: string;
 
   skills?: string[];

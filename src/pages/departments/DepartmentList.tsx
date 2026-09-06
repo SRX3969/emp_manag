@@ -180,7 +180,7 @@ export function DepartmentList() {
               onChange={(e) => setFormData({ ...formData, code: e.target.value })}
             />
             <Input
-              label="Annual Budget (USD)"
+              label="Annual Budget (₹)"
               type="number"
               value={formData.annualBudget}
               onChange={(e) => setFormData({ ...formData, annualBudget: Number(e.target.value) })}

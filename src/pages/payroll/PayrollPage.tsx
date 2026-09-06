@@ -268,10 +268,10 @@ export function PayrollPage() {
             <div className="flex items-start justify-between border-b border-slate-200 dark:border-[#292B30] pb-4">
               <div>
                 <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 font-heading">
-                  Apex Global Technologies Ltd.
+                  Apex Global Technologies India Pvt. Ltd.
                 </h3>
-                <p className="text-slate-500">450 Lexington Avenue, Floor 18, New York, NY</p>
-                <p className="text-slate-500">EIN: XX-XXXX982 · Payroll Ref: {selectedPayslip.id}</p>
+                <p className="text-slate-500">Outer Ring Road, Bellandur, Bengaluru, Karnataka 560103</p>
+                <p className="text-slate-500">CIN: U72200KA2023PTC158941 · GSTIN: 29AABCA1234F1Z5 · Ref: {selectedPayslip.id}</p>
               </div>
               <div className="text-right">
                 <span className="text-sm font-bold text-slate-900 dark:text-slate-100 block">
@@ -300,6 +300,22 @@ export function PayrollPage() {
               <div>
                 <span className="text-slate-400 text-[10px] block">Designation</span>
                 <span>{selectedPayslip.designation}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 text-[10px] block">Permanent Account (PAN)</span>
+                <span className="font-mono font-semibold text-slate-800 dark:text-slate-200">{selectedPayslip.panNumber || 'AAAPS1234A'}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 text-[10px] block">Universal Account (UAN / EPF)</span>
+                <span className="font-mono">{selectedPayslip.uanNumber || '100982347101'}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 text-[10px] block">Bank Account No.</span>
+                <span className="font-mono">{selectedPayslip.bankAccountNumber}</span>
+              </div>
+              <div>
+                <span className="text-slate-400 text-[10px] block">Bank IFSC Code</span>
+                <span className="font-mono">{selectedPayslip.ifscCode || 'HDFC0001234'}</span>
               </div>
             </div>
 
@@ -337,19 +353,19 @@ export function PayrollPage() {
               {/* Deductions Column */}
               <div className="space-y-2">
                 <h4 className="font-semibold text-slate-900 dark:text-slate-100 border-b border-slate-200 dark:border-[#292B30] pb-1">
-                  Deductions
+                  Statutory Deductions
                 </h4>
                 <div className="space-y-1.5">
                   <div className="flex justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Income Tax (Federal & State)</span>
+                    <span className="text-slate-600 dark:text-slate-400">Income Tax (TDS / Sec 192)</span>
                     <span>{formatCurrency(selectedPayslip.incomeTax)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Provident Fund / 401(k)</span>
+                    <span className="text-slate-600 dark:text-slate-400">Employee Provident Fund (EPF 12%)</span>
                     <span>{formatCurrency(selectedPayslip.providentFund)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Professional Tax</span>
+                    <span className="text-slate-600 dark:text-slate-400">Professional Tax (PT)</span>
                     <span>{formatCurrency(selectedPayslip.professionalTax)}</span>
                   </div>
                   <div className="flex justify-between pt-2 border-t border-slate-100 dark:border-[#202227] font-bold text-red-600 dark:text-red-400">

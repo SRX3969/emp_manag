@@ -43,7 +43,9 @@ export interface Payslip {
   designation: string;
   departmentName: string;
   bankAccountNumber?: string;
+  ifscCode?: string;
   panNumber?: string;
+  uanNumber?: string;
   payPeriod: string;
   paymentDate: string;
   paymentStatus: PaymentStatus;

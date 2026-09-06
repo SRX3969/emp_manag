@@ -41,8 +41,8 @@ export function TopNav({ onOpenMobileMenu, onOpenSearch }: TopNavProps) {
   const [showNewOrgModal, setShowNewOrgModal] = useState(false);
 
   const [newOrgName, setNewOrgName] = useState('');
-  const [newOrgCurrency, setNewOrgCurrency] = useState('USD');
-  const [newOrgTimezone, setNewOrgTimezone] = useState('America/New_York (EST)');
+  const [newOrgCurrency, setNewOrgCurrency] = useState('INR');
+  const [newOrgTimezone, setNewOrgTimezone] = useState('Asia/Kolkata (IST)');
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -413,10 +413,10 @@ export function TopNav({ onOpenMobileMenu, onOpenSearch }: TopNavProps) {
             <Select
               label="Operating Currency"
               options={[
-                { value: 'USD', label: 'USD ($)' },
-                { value: 'EUR', label: 'EUR (€)' },
-                { value: 'GBP', label: 'GBP (£)' },
-                { value: 'INR', label: 'INR (₹)' },
+                { value: 'INR', label: 'INR (₹) - Indian Rupee' },
+                { value: 'USD', label: 'USD ($) - US Dollar' },
+                { value: 'EUR', label: 'EUR (€) - Euro' },
+                { value: 'GBP', label: 'GBP (£) - British Pound' },
                 { value: 'SGD', label: 'SGD (S$)' },
               ]}
               value={newOrgCurrency}
@@ -426,10 +426,10 @@ export function TopNav({ onOpenMobileMenu, onOpenSearch }: TopNavProps) {
             <Select
               label="Timezone"
               options={[
+                { value: 'Asia/Kolkata (IST)', label: 'Asia/Kolkata (IST - India)' },
                 { value: 'America/New_York (EST)', label: 'America/New_York (EST)' },
                 { value: 'America/Los_Angeles (PST)', label: 'America/Los_Angeles (PST)' },
                 { value: 'Europe/London (GMT)', label: 'Europe/London (GMT)' },
-                { value: 'Asia/Kolkata (IST)', label: 'Asia/Kolkata (IST)' },
                 { value: 'Asia/Singapore (SGT)', label: 'Asia/Singapore (SGT)' },
               ]}
               value={newOrgTimezone}

@@ -4,17 +4,17 @@ import { mockOrganization, mockUsers } from '@/data/mockData';
 
 export const cleanProductionOrg: Organization = {
   id: 'org_prod_clean',
-  name: 'Acme Corporation (Production)',
-  slug: 'acme-corp-prod',
-  currency: 'USD',
-  fiscalYearStart: 'January',
-  timezone: 'America/New_York (EST)',
+  name: 'Acme India Technologies (Production)',
+  slug: 'acme-india-prod',
+  currency: 'INR',
+  fiscalYearStart: 'April',
+  timezone: 'Asia/Kolkata (IST)',
   isDemo: false,
   createdAt: '2026-09-01T00:00:00Z',
 };
 
 const initialOrganizations: Organization[] = [
-  { ...mockOrganization, isDemo: true, name: 'Apex Global Technologies (Demo)' },
+  { ...mockOrganization, isDemo: true, name: 'Apex Global Technologies India (Demo)' },
   cleanProductionOrg,
 ];
 
@@ -124,9 +124,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       id: `org_${Date.now()}`,
       name: data.name,
       slug,
-      currency: data.currency || 'USD',
-      fiscalYearStart: 'January',
-      timezone: data.timezone || 'America/New_York (EST)',
+      currency: data.currency || 'INR',
+      fiscalYearStart: 'April',
+      timezone: data.timezone || 'Asia/Kolkata (IST)',
       isDemo: false,
       createdAt: new Date().toISOString(),
     };

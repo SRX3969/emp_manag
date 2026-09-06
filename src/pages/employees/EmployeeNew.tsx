@@ -37,9 +37,9 @@ export function EmployeeNew() {
     dateOfBirth: '1995-05-15',
     avatarUrl: '',
     address: '',
-    city: 'New York',
-    country: 'United States',
-    postalCode: '10001',
+    city: 'Bengaluru',
+    country: 'India',
+    postalCode: '560103',
     emergencyContactName: '',
     emergencyContactRelation: 'Spouse',
     emergencyContactPhone: '',
@@ -50,11 +50,14 @@ export function EmployeeNew() {
     employmentType: 'FULL_TIME' as EmploymentType,
     workLocation: 'Hybrid' as 'On-site' | 'Remote' | 'Hybrid',
     status: 'ACTIVE' as EmployeeStatus,
-    salary: 95000,
+    salary: 2400000,
     payType: 'SALARIED' as PayType,
-    currency: 'USD',
+    currency: 'INR',
     bankAccountNumber: '',
     taxIdentificationNumber: '',
+    panNumber: '',
+    uanNumber: '',
+    ifscCode: '',
     bio: '',
   });
 
@@ -123,7 +126,10 @@ export function EmployeeNew() {
         payType: formData.payType,
         currency: formData.currency,
         bankAccountNumber: formData.bankAccountNumber.trim() || '**** **** 8921',
-        taxIdentificationNumber: formData.taxIdentificationNumber.trim() || 'XXX-XX-1100',
+        taxIdentificationNumber: formData.panNumber.trim() || formData.taxIdentificationNumber.trim() || 'AAAPS1234A',
+        panNumber: formData.panNumber.trim() || 'AAAPS1234A',
+        uanNumber: formData.uanNumber.trim() || '100982347101',
+        ifscCode: formData.ifscCode.trim() || 'HDFC0001234',
         bio: formData.bio.trim(),
       });
 
@@ -359,13 +365,13 @@ export function EmployeeNew() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
-              label="Annual Base Salary"
+              label="Annual Base CTC / Salary (₹)"
               type="number"
               required
               value={formData.salary}
               onChange={(e) => setFormData({ ...formData, salary: Number(e.target.value) })}
               error={errors.salary}
-              placeholder="e.g. 120000"
+              placeholder="e.g. 2400000"
             />
             <Select
               label="Pay Frequency / Type"
@@ -377,16 +383,28 @@ export function EmployeeNew() {
               ]}
             />
             <Input
-              label="Bank Account Mask / Routing"
+              label="Permanent Account Number (PAN)"
+              value={formData.panNumber}
+              onChange={(e) => setFormData({ ...formData, panNumber: e.target.value.toUpperCase() })}
+              placeholder="e.g. AAAPS1234A"
+            />
+            <Input
+              label="Universal Account Number (UAN / EPF)"
+              value={formData.uanNumber}
+              onChange={(e) => setFormData({ ...formData, uanNumber: e.target.value })}
+              placeholder="e.g. 100982347101"
+            />
+            <Input
+              label="Bank Account Number"
               value={formData.bankAccountNumber}
               onChange={(e) => setFormData({ ...formData, bankAccountNumber: e.target.value })}
               placeholder="**** **** 8921"
             />
             <Input
-              label="Tax Identification / SSN"
-              value={formData.taxIdentificationNumber}
-              onChange={(e) => setFormData({ ...formData, taxIdentificationNumber: e.target.value })}
-              placeholder="XXX-XX-1100"
+              label="Bank IFSC Code"
+              value={formData.ifscCode}
+              onChange={(e) => setFormData({ ...formData, ifscCode: e.target.value.toUpperCase() })}
+              placeholder="e.g. HDFC0001234"
             />
           </div>
         </div>
