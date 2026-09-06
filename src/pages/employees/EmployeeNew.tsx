@@ -20,6 +20,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { EmployeeStatus, EmploymentType, Gender, PayType } from '@/types/employee';
+import { PageTransition } from '@/components/motion/Motion';
 
 export function EmployeeNew() {
   const { addEmployee, departments, employees } = useData();
@@ -132,10 +133,10 @@ export function EmployeeNew() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <PageTransition className="space-y-6 max-w-4xl pb-12">
       <PageHeader
         title="Add New Employee"
-        description="Create a verified employee record and provision workforce access."
+        description="Register and provision a new employee record into the organization."
         breadcrumbs={[
           { label: 'Home', href: '/dashboard' },
           { label: 'Employees', href: '/employees' },
@@ -400,6 +401,6 @@ export function EmployeeNew() {
           </Button>
         </div>
       </form>
-    </div>
+    </PageTransition>
   );
 }

@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
 import { EmployeeStatus, EmploymentType, Gender, PayType } from '@/types/employee';
 import { CheckCircle, ArrowLeft } from 'lucide-react';
+import { PageTransition } from '@/components/motion/Motion';
 
 export function EmployeeEdit() {
   const { id } = useParams<{ id: string }>();
@@ -74,7 +75,7 @@ export function EmployeeEdit() {
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <PageTransition className="space-y-6 max-w-4xl mx-auto">
       <PageHeader
         title={`Edit: ${employee.fullName}`}
         description={`Update employment details, status, and compensation for ${employee.employeeCode}`}
@@ -192,6 +193,6 @@ export function EmployeeEdit() {
           </Button>
         </div>
       </form>
-    </div>
+    </PageTransition>
   );
 }

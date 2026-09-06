@@ -21,6 +21,7 @@ import {
   UserX,
 } from 'lucide-react';
 import { ConfirmDialog } from '@/components/ui/Dialog';
+import { PageTransition } from '@/components/motion/Motion';
 
 export function EmployeeList() {
   const { employees, departments, deleteEmployee } = useData();
@@ -209,7 +210,7 @@ export function EmployeeList() {
   };
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <PageHeader
         title="Employee Directory"
         description="Comprehensive directory of all organization personnel, team assignments, and employment records."
@@ -306,6 +307,6 @@ export function EmployeeList() {
         confirmText="Deactivate Profile"
         variant="danger"
       />
-    </div>
+    </PageTransition>
   );
 }

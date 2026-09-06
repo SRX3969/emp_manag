@@ -22,6 +22,7 @@ import {
   Building,
 } from 'lucide-react';
 import { Candidate, CandidateStage, JobOpening } from '@/types/system';
+import { PageTransition, RevealCard } from '@/components/motion/Motion';
 
 export function RecruitmentPage() {
   const {
@@ -96,7 +97,7 @@ export function RecruitmentPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <PageHeader
         title="Talent Acquisition & Recruitment"
         description="Candidate pipelines, applicant screening stages, interview scoring, and direct employee provisioning."
@@ -356,6 +357,6 @@ export function RecruitmentPage() {
           </form>
         )}
       </Dialog>
-    </div>
+    </PageTransition>
   );
 }

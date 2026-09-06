@@ -4,6 +4,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { Button } from '@/components/ui/Button';
 import { StatCard } from '@/components/ui/StatCard';
+import { PageTransition } from '@/components/motion/Motion';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import {
   BarChart3,
@@ -78,7 +79,7 @@ export function ReportsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <PageHeader
         title="Enterprise Analytics & Reports"
         description="Comprehensive workforce intelligence, headcount distribution, attendance analytics, and payroll exports."
@@ -117,24 +118,28 @@ export function ReportsPage() {
           value={filteredEmployees.length}
           subtitle="Across active departments"
           icon={<Users className="w-5 h-5 text-blue-600" />}
+          delayMs={40}
         />
         <StatCard
           title="Punctuality Rate"
           value={`${avgAttendance}%`}
           subtitle="Avg on-time arrival"
           icon={<Clock className="w-5 h-5 text-emerald-600" />}
+          delayMs={80}
         />
         <StatCard
           title="Leave Requests"
           value={leaveRequests.length}
           subtitle="Total submitted YTD"
           icon={<Calendar className="w-5 h-5 text-amber-600" />}
+          delayMs={120}
         />
         <StatCard
           title="Disbursed Payroll YTD"
           value={formatCurrency(totalPayrollGross)}
           subtitle="Gross company expenses"
           icon={<DollarSign className="w-5 h-5 text-purple-600" />}
+          delayMs={160}
         />
       </div>
 
@@ -245,6 +250,6 @@ export function ReportsPage() {
           </div>
         </div>
       )}
-    </div>
+    </PageTransition>
   );
 }

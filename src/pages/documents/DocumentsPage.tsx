@@ -19,6 +19,7 @@ import {
   Filter,
 } from 'lucide-react';
 import { DocumentCategory, DocumentItem } from '@/types/document';
+import { PageTransition, RevealCard } from '@/components/motion/Motion';
 
 export function DocumentsPage() {
   const { documents, employees, uploadDocument, deleteDocument } = useData();
@@ -94,7 +95,7 @@ export function DocumentsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <PageHeader
         title="Document Vault & Storage"
         description="Secure enterprise repository for employment agreements, verified ID proofs, certifications, and compliance policies."
@@ -139,10 +140,11 @@ export function DocumentsPage() {
 
       {/* Documents Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredDocs.map((doc) => (
-          <div
+        {filteredDocs.map((doc, idx) => (
+          <RevealCard
             key={doc.id}
-            className="p-4 rounded-lg border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] shadow-sm flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-all text-xs"
+            delayMs={30 * (idx + 1)}
+            className="p-4 flex flex-col justify-between text-xs"
           >
             <div>
               <div className="flex items-center justify-between gap-2 mb-2">
@@ -189,7 +191,7 @@ export function DocumentsPage() {
                 )}
               </div>
             </div>
-          </div>
+          </RevealCard>
         ))}
       </div>
 
@@ -267,6 +269,6 @@ export function DocumentsPage() {
         confirmText="Delete Document"
         variant="danger"
       />
-    </div>
+    </PageTransition>
   );
 }

@@ -21,6 +21,7 @@ import {
   UserCheck,
 } from 'lucide-react';
 import { LeaveRequest, LeaveRequestStatus } from '@/types/leave';
+import { PageTransition, RevealCard, AnimatedNumber } from '@/components/motion/Motion';
 
 export function LeavePage() {
   const {
@@ -107,7 +108,7 @@ export function LeavePage() {
   };
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <PageHeader
         title="Leave & Time-Off Management"
         description="Employee paid time off, sick leave balances, approval workflows, and company absence calendar."
@@ -121,10 +122,11 @@ export function LeavePage() {
 
       {/* Leave Balances Header Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {myBalances.map((bal) => (
-          <div
+        {myBalances.map((bal, idx) => (
+          <RevealCard
             key={bal.id}
-            className="rounded-lg border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] p-4 shadow-sm"
+            delayMs={40 * (idx + 1)}
+            className="p-4"
           >
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
@@ -135,7 +137,7 @@ export function LeavePage() {
               </span>
             </div>
             <p className="text-2xl font-bold text-slate-900 dark:text-slate-100 mt-2 font-heading">
-              {bal.remainingDays}{' '}
+              <AnimatedNumber value={bal.remainingDays} />{' '}
               <span className="text-xs font-normal text-slate-400">days available</span>
             </p>
             <div className="mt-2 text-[11px] text-slate-500 flex justify-between pt-2 border-t border-slate-100 dark:border-[#202227]">
@@ -143,7 +145,7 @@ export function LeavePage() {
               <span>Pending: {bal.pendingDays}d</span>
               <span>Total: {bal.allocatedDays}d</span>
             </div>
-          </div>
+          </RevealCard>
         ))}
       </div>
 
@@ -377,6 +379,6 @@ export function LeavePage() {
           </div>
         </form>
       </Dialog>
-    </div>
+    </PageTransition>
   );
 }

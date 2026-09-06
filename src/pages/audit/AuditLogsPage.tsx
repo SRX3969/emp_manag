@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/Badge';
 import { formatDateTime } from '@/lib/utils';
 import { ShieldAlert, ShieldCheck, Download, Search } from 'lucide-react';
 import { AuditLogItem } from '@/types/system';
+import { PageTransition } from '@/components/motion/Motion';
 
 export function AuditLogsPage() {
   const { auditLogs } = useData();
@@ -79,7 +80,7 @@ export function AuditLogsPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <PageHeader
         title="Security & System Audit Logs"
         description="Immutable compliance trail capturing all personnel updates, payroll disbursements, and permission modifications."
@@ -108,6 +109,6 @@ export function AuditLogsPage() {
           </select>
         }
       />
-    </div>
+    </PageTransition>
   );
 }

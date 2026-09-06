@@ -19,6 +19,7 @@ import {
   ArrowRight,
   TrendingUp,
 } from 'lucide-react';
+import { PageTransition, RevealCard } from '@/components/motion/Motion';
 
 export function DepartmentList() {
   const { departments, employees, addDepartment } = useData();
@@ -67,7 +68,7 @@ export function DepartmentList() {
   };
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <PageHeader
         title="Departments & Teams"
         description="Functional business units, managerial hierarchy, and personnel allocation across Apex Global."
@@ -83,14 +84,15 @@ export function DepartmentList() {
 
       {/* Department Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {departments.map((dept) => {
+        {departments.map((dept, idx) => {
           const deptEmployees = employees.filter((e) => e.departmentId === dept.id);
           const activeCount = deptEmployees.filter((e) => e.status === 'ACTIVE').length;
 
           return (
-            <div
+            <RevealCard
               key={dept.id}
-              className="rounded-lg border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] p-5 shadow-sm flex flex-col justify-between hover:border-slate-300 dark:hover:border-slate-700 transition-all"
+              delayMs={40 * (idx + 1)}
+              className="p-5 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-2">
@@ -149,7 +151,7 @@ export function DepartmentList() {
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
-            </div>
+            </RevealCard>
           );
         })}
       </div>
@@ -214,6 +216,6 @@ export function DepartmentList() {
           </div>
         </form>
       </Dialog>
-    </div>
+    </PageTransition>
   );
 }

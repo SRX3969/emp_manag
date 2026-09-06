@@ -20,6 +20,7 @@ import {
   User,
 } from 'lucide-react';
 import { TaskItem, TaskPriority, TaskStatus } from '@/types/system';
+import { PageTransition, RevealCard } from '@/components/motion/Motion';
 
 export function TasksPage() {
   const { tasks, employees, addTask, updateTaskStatus } = useData();
@@ -87,7 +88,7 @@ export function TasksPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <PageHeader
         title="Tasks & Deliverables"
         description="Operational task board, responsibility delegation, and team milestone tracking."
@@ -116,7 +117,7 @@ export function TasksPage() {
 
       {/* Kanban Column View */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {statuses.map((status) => {
+        {statuses.map((status, colIdx) => {
           const colTasks = filteredTasks.filter((t) => t.status === status);
 
           return (
@@ -134,9 +135,10 @@ export function TasksPage() {
               </div>
 
               <div className="space-y-3 flex-1 overflow-y-auto">
-                {colTasks.map((task) => (
-                  <div
+                {colTasks.map((task, taskIdx) => (
+                  <RevealCard
                     key={task.id}
+                    delayMs={30 * (colIdx * 3 + taskIdx + 1)}
                     className="p-4 rounded-md border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] shadow-xs text-xs space-y-2 hover:border-blue-500/50 transition-all"
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -158,24 +160,24 @@ export function TasksPage() {
                     )}
 
                     <div className="pt-2 border-t border-slate-100 dark:border-[#202227] flex items-center justify-between">
-                      <div className="flex items-center gap-1.5 text-[11px] text-slate-600 dark:text-slate-400">
+                      <div className="flex items-center gap-1.5 text-slate-500">
                         <Avatar name={task.assigneeName} size="xs" />
-                        <span className="truncate max-w-[100px]">{task.assigneeName}</span>
+                        <span className="text-[11px] font-medium">{task.assigneeName}</span>
                       </div>
 
-                      {/* Status quick mover */}
+                      {/* Quick Move Trigger */}
                       <select
                         value={task.status}
                         onChange={(e) => updateTaskStatus(task.id, e.target.value as TaskStatus)}
-                        aria-label="Update task status"
-                        className="rounded border border-slate-200 bg-slate-50 px-1.5 py-0.5 text-[10px] text-slate-600 dark:border-[#292B30] dark:bg-[#1D1F23] dark:text-slate-300 focus:outline-none"
+                        aria-label={`Change status for task ${task.title}`}
+                        className="text-[11px] rounded bg-slate-100 dark:bg-[#202227] px-2 py-0.5 border-0 text-slate-700 dark:text-slate-300 focus:ring-1 focus:ring-blue-500"
                       >
                         <option value="TODO">To Do</option>
                         <option value="IN_PROGRESS">In Progress</option>
                         <option value="COMPLETED">Completed</option>
                       </select>
                     </div>
-                  </div>
+                  </RevealCard>
                 ))}
               </div>
             </div>
@@ -242,6 +244,6 @@ export function TasksPage() {
           </div>
         </form>
       </Dialog>
-    </div>
+    </PageTransition>
   );
 }

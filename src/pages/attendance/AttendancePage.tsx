@@ -21,6 +21,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { AttendanceRecord, AttendanceStatus } from '@/types/attendance';
+import { PageTransition, RevealCard } from '@/components/motion/Motion';
 
 export function AttendancePage() {
   const { attendanceRecords, employees, clockIn, clockOut } = useData();
@@ -154,8 +155,13 @@ export function AttendancePage() {
     },
   ];
 
+  const handleCorrectionSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsCorrectionModalOpen(false);
+  };
+
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <PageHeader
         title="Attendance & Timesheets"
         description="Shift tracking, clock-in logs, timesheet verification, and punctuality monitoring."
@@ -175,7 +181,7 @@ export function AttendancePage() {
       />
 
       {/* Clock In / Out Quick Terminal */}
-      <div className="rounded-lg border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] p-5 shadow-sm">
+      <RevealCard delayMs={30} className="p-5">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2.5 rounded-lg bg-blue-50 text-blue-600 dark:bg-blue-950/50 dark:text-blue-400">
@@ -220,7 +226,7 @@ export function AttendancePage() {
             )}
           </div>
         </div>
-      </div>
+      </RevealCard>
 
       {/* Data Table with Date Selector */}
       <DataTable
@@ -248,6 +254,7 @@ export function AttendancePage() {
               <option value="PRESENT">Present</option>
               <option value="LATE">Late</option>
               <option value="WORK_FROM_HOME">Work From Home</option>
+              <option value="HALF_DAY">Half Day</option>
               <option value="ON_LEAVE">On Leave</option>
               <option value="ABSENT">Absent</option>
             </select>
@@ -260,32 +267,26 @@ export function AttendancePage() {
         isOpen={isCorrectionModalOpen}
         onClose={() => setIsCorrectionModalOpen(false)}
         title="Request Attendance Correction"
-        description="Submit a timesheet adjustment request to your department manager."
+        description="Submit a verified correction request for your supervisor or HR administrator."
       >
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setIsCorrectionModalOpen(false);
-          }}
-          className="space-y-4"
-        >
+        <form onSubmit={handleCorrectionSubmit} className="space-y-4">
           <Input
-            label="Shift Date"
+            label="Date"
             type="date"
             required
             value={correctionForm.date}
             onChange={(e) => setCorrectionForm({ ...correctionForm, date: e.target.value })}
           />
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             <Input
-              label="Actual Check In"
+              label="Clock In Time"
               type="time"
               required
               value={correctionForm.clockIn}
               onChange={(e) => setCorrectionForm({ ...correctionForm, clockIn: e.target.value })}
             />
             <Input
-              label="Actual Check Out"
+              label="Clock Out Time"
               type="time"
               required
               value={correctionForm.clockOut}
@@ -293,13 +294,13 @@ export function AttendancePage() {
             />
           </div>
           <Input
-            label="Reason for Adjustment"
+            label="Reason for Correction"
             required
-            placeholder="e.g. Biometric reader was offline / Client offsite meeting"
+            placeholder="e.g. Card reader was offline at security desk"
             value={correctionForm.reason}
             onChange={(e) => setCorrectionForm({ ...correctionForm, reason: e.target.value })}
           />
-          <div className="flex items-center justify-end gap-2.5 pt-4 border-t border-slate-100 dark:border-[#202227]">
+          <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 dark:border-[#202227]">
             <Button variant="outline" size="sm" type="button" onClick={() => setIsCorrectionModalOpen(false)}>
               Cancel
             </Button>
@@ -309,6 +310,6 @@ export function AttendancePage() {
           </div>
         </form>
       </Dialog>
-    </div>
+    </PageTransition>
   );
 }

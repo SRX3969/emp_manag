@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/Select';
 import { formatDate } from '@/lib/utils';
 import { Target, Award, Plus, CheckCircle, TrendingUp, UserCheck, Star } from 'lucide-react';
 import { PerformanceGoal, PerformanceReview, GoalStatus } from '@/types/performance';
+import { PageTransition, RevealCard } from '@/components/motion/Motion';
 
 export function PerformancePage() {
   const { goals, reviews, employees, addGoal, updateGoal, submitReview } = useData();
@@ -85,7 +86,7 @@ export function PerformancePage() {
   };
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <PageHeader
         title="Performance & Appraisals"
         description="Strategic OKRs, professional development goals, quarterly appraisals, and manager evaluations."
@@ -109,10 +110,11 @@ export function PerformancePage() {
       {/* Tab 1: Goals */}
       {activeTab === 'goals' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {goals.map((goal) => (
-            <div
+          {goals.map((goal, idx) => (
+            <RevealCard
               key={goal.id}
-              className="p-5 rounded-lg border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] shadow-sm text-xs space-y-3 flex flex-col justify-between"
+              delayMs={35 * (idx + 1)}
+              className="p-5 text-xs space-y-3 flex flex-col justify-between"
             >
               <div>
                 <div className="flex items-center justify-between gap-2 mb-2">
@@ -159,7 +161,7 @@ export function PerformancePage() {
                   />
                 </div>
               </div>
-            </div>
+            </RevealCard>
           ))}
         </div>
       )}
@@ -355,6 +357,6 @@ export function PerformancePage() {
           </form>
         )}
       </Dialog>
-    </div>
+    </PageTransition>
   );
 }

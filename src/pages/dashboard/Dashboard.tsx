@@ -9,6 +9,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Dialog } from '@/components/ui/Dialog';
 import { Input } from '@/components/ui/Input';
 import { Select } from '@/components/ui/Select';
+import { PageTransition, RevealCard, FadeIn } from '@/components/motion/Motion';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import {
   Users,
@@ -190,7 +191,7 @@ export function Dashboard() {
   };
 
   return (
-    <div className="space-y-6 select-none">
+    <PageTransition className="space-y-6 select-none">
       {/* ========================================================= */}
       {/* 1. EMPLOYER / MANAGEMENT COMMAND CENTER VIEW */}
       {/* ========================================================= */}
@@ -226,6 +227,7 @@ export function Dashboard() {
               subtitle={totalEmployees > 0 ? `${activeEmployees} Active · ${probationCount} Probation` : 'No employees registered'}
               icon={<Users className="w-5 h-5 text-blue-600 dark:text-blue-400" />}
               change={{ value: totalEmployees > 0 ? `${activeEmployees} active in org` : '0 employees', trend: totalEmployees > 0 ? 'up' : 'neutral' }}
+              delayMs={40}
             />
             <StatCard
               title="Present Today"
@@ -233,25 +235,28 @@ export function Dashboard() {
               subtitle={`${attendanceRate}% attendance rate`}
               icon={<UserCheck className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />}
               change={{ value: `${presentToday} of ${totalEmployees} clocked in`, trend: presentToday > 0 ? 'up' : 'neutral' }}
+              delayMs={80}
             />
             <StatCard
               title="On Leave Today"
               value={approvedLeavesToday || onLeaveCount}
               subtitle={`${pendingLeaves.length} pending review`}
               icon={<CalendarOff className="w-5 h-5 text-amber-600 dark:text-amber-400" />}
+              delayMs={120}
             />
             <StatCard
               title="Monthly Payroll Liability"
               value={formatCurrency(totalMonthlyPayrollLiability)}
               subtitle={`Active payroll base (${activeEmployees} staff)`}
               icon={<DollarSign className="w-5 h-5 text-purple-600 dark:text-purple-400" />}
+              delayMs={160}
             />
           </div>
 
           {/* Middle Row: Pending Approvals & Dynamic Department Distribution */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Pending Approvals Queue */}
-            <div className="lg:col-span-2 rounded-xl border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] shadow-xs p-5">
+            <RevealCard delayMs={200} className="lg:col-span-2 p-5">
               <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
                 <div className="flex items-center gap-2">
                   <div className="p-1.5 rounded-md bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400">
@@ -329,10 +334,10 @@ export function Dashboard() {
                   ))}
                 </div>
               )}
-            </div>
+            </RevealCard>
 
             {/* Real Department Headcount Distribution */}
-            <div className="rounded-xl border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] shadow-xs p-5">
+            <RevealCard delayMs={240} className="p-5">
               <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
                 <div className="flex items-center gap-2">
                   <div className="p-1.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400">
@@ -379,13 +384,13 @@ export function Dashboard() {
                   ))}
                 </div>
               )}
-            </div>
+            </RevealCard>
           </div>
 
           {/* Quick Management Actions & Audit Log Stream */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Quick Operational Shortcuts */}
-            <div className="rounded-xl border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] shadow-xs p-5">
+            <RevealCard delayMs={280} className="p-5">
               <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100 mb-3 border-b border-slate-100 dark:border-[#202227] pb-2.5">
                 Workforce Quick Actions
               </h3>
@@ -422,10 +427,10 @@ export function Dashboard() {
                   <span className="font-semibold text-slate-800 dark:text-slate-200">Broadcast Notice</span>
                 </Link>
               </div>
-            </div>
+            </RevealCard>
 
             {/* Real System Audit Trail */}
-            <div className="lg:col-span-2 rounded-xl border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] shadow-xs p-5">
+            <RevealCard delayMs={320} className="lg:col-span-2 p-5">
               <div className="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-[#202227] pb-2.5">
                 <div className="flex items-center gap-2">
                   <Activity className="w-4 h-4 text-slate-500" />
@@ -464,7 +469,7 @@ export function Dashboard() {
                   ))}
                 </div>
               )}
-            </div>
+            </RevealCard>
           </div>
         </>
       ) : (
@@ -473,7 +478,7 @@ export function Dashboard() {
         /* ========================================================= */
         <>
           {/* Employee Workspace Header */}
-          <div className="p-6 rounded-2xl border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <RevealCard delayMs={40} className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <Avatar
                 src={currentUser.avatarUrl || currentEmpRecord?.avatarUrl}
@@ -507,12 +512,12 @@ export function Dashboard() {
                 Apply for Leave
               </Button>
             </div>
-          </div>
+          </RevealCard>
 
           {/* Clock In / Out Live Attendance & Leave Balances */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Live Shift Attendance Card */}
-            <div className="rounded-xl border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] p-5 shadow-xs flex flex-col justify-between">
+            <RevealCard delayMs={80} className="p-5 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-[#202227] pb-2.5">
                   <div className="flex items-center gap-2">
@@ -595,10 +600,10 @@ export function Dashboard() {
                   </Button>
                 )}
               </div>
-            </div>
+            </RevealCard>
 
             {/* Leave Balances & Fast Apply */}
-            <div className="lg:col-span-2 rounded-xl border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] p-5 shadow-xs flex flex-col justify-between">
+            <RevealCard delayMs={120} className="lg:col-span-2 p-5 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
                   <div className="flex items-center gap-2">
@@ -669,13 +674,13 @@ export function Dashboard() {
                   </Button>
                 </Link>
               </div>
-            </div>
+            </RevealCard>
           </div>
 
           {/* Bottom Row: My Active Tasks & Upcoming Holidays */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* My Active Assigned Tasks */}
-            <div className="rounded-xl border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] p-5 shadow-xs">
+            <RevealCard delayMs={160} className="p-5">
               <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
                 <div className="flex items-center gap-2">
                   <CheckSquare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -743,10 +748,10 @@ export function Dashboard() {
                   })}
                 </div>
               )}
-            </div>
+            </RevealCard>
 
             {/* Upcoming Holidays Calendar */}
-            <div className="rounded-xl border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] p-5 shadow-xs">
+            <RevealCard delayMs={200} className="p-5">
               <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -787,13 +792,13 @@ export function Dashboard() {
                   ))}
                 </div>
               )}
-            </div>
+            </RevealCard>
           </div>
         </>
       )}
 
       {/* Global Company Announcements Card (Visible across both portals) */}
-      <div className="rounded-xl border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] p-5 shadow-xs">
+      <RevealCard delayMs={240} className="p-5">
         <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-[#202227] pb-3">
           <div className="flex items-center gap-2">
             <Megaphone className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -839,7 +844,7 @@ export function Dashboard() {
                   <button
                     type="button"
                     onClick={() => markAnnouncementRead(ann.id)}
-                    className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                    className="text-blue-600 dark:text-blue-400 hover:underline font-medium cursor-pointer"
                   >
                     Mark as Read
                   </button>
@@ -848,7 +853,7 @@ export function Dashboard() {
             ))}
           </div>
         )}
-      </div>
+      </RevealCard>
 
       {/* Quick Apply Leave Modal for Employee */}
       <Dialog
@@ -902,6 +907,6 @@ export function Dashboard() {
           </div>
         </form>
       </Dialog>
-    </div>
+    </PageTransition>
   );
 }

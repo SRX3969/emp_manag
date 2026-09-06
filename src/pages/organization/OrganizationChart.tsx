@@ -15,6 +15,7 @@ import {
   Maximize2,
 } from 'lucide-react';
 import { Employee } from '@/types/employee';
+import { PageTransition } from '@/components/motion/Motion';
 
 interface OrgCardProps {
   employee: Employee;
@@ -115,7 +116,7 @@ export function OrganizationChart() {
   const directReports = employees.filter((e) => e.managerId === rootLeader?.id);
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <PageHeader
         title="Organization Hierarchy"
         description="Interactive corporate reporting lines, executive hierarchy, and department leadership map."
@@ -136,6 +137,6 @@ export function OrganizationChart() {
           <p className="text-sm text-slate-500">No organizational records found.</p>
         )}
       </div>
-    </div>
+    </PageTransition>
   );
 }

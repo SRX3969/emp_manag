@@ -7,6 +7,7 @@ import { Avatar } from '@/components/ui/Avatar';
 import { Badge } from '@/components/ui/Badge';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { ArrowLeft, Building2, UserCheck, DollarSign, Users, Mail, Phone } from 'lucide-react';
+import { PageTransition, RevealCard } from '@/components/motion/Motion';
 
 export function DepartmentDetail() {
   const { id } = useParams<{ id: string }>();
@@ -31,7 +32,7 @@ export function DepartmentDetail() {
   const manager = employees.find((e) => e.id === department.managerId);
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <PageHeader
         title={department.name}
         description={`Code: ${department.code} · ${deptMembers.length} Team Members · Annual Budget: ${formatCurrency(department.annualBudget)}`}
@@ -50,7 +51,7 @@ export function DepartmentDetail() {
       />
 
       {/* Top Details Card */}
-      <div className="rounded-lg border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] p-6 shadow-sm">
+      <RevealCard delayMs={30} className="p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-3">
             <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
@@ -76,7 +77,7 @@ export function DepartmentDetail() {
             )}
           </div>
         </div>
-      </div>
+      </RevealCard>
 
       {/* Members Roster */}
       <div className="rounded-lg border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] shadow-sm overflow-hidden">
@@ -118,6 +119,6 @@ export function DepartmentDetail() {
           ))}
         </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }

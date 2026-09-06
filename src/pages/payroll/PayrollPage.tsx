@@ -20,6 +20,7 @@ import {
   Building,
 } from 'lucide-react';
 import { PayrollRun, Payslip, PayPeriodStatus } from '@/types/payroll';
+import { PageTransition, RevealCard } from '@/components/motion/Motion';
 
 export function PayrollPage() {
   const { payrollRuns, payslips, employees, createPayrollRun, processPayrollRun } = useData();
@@ -76,7 +77,7 @@ export function PayrollPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <PageHeader
         title="Payroll & Compensation"
         description="Salary disbursements, tax calculations, pay period processing, and individual payslips."
@@ -442,6 +443,6 @@ export function PayrollPage() {
         confirmText="Confirm Disbursement"
         variant="primary"
       />
-    </div>
+    </PageTransition>
   );
 }

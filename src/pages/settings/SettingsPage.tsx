@@ -20,6 +20,7 @@ import {
   Save,
   Lock,
 } from 'lucide-react';
+import { PageTransition } from '@/components/motion/Motion';
 
 export function SettingsPage() {
   const { settings, updateSettings, employees } = useData();
@@ -52,7 +53,7 @@ export function SettingsPage() {
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <PageTransition className="space-y-6 max-w-5xl mx-auto">
       <PageHeader
         title="Organization Settings & Policies"
         description="Global system configurations, company governance rules, security parameters, and regional localization."
@@ -304,6 +305,6 @@ export function SettingsPage() {
           </Button>
         </div>
       </form>
-    </div>
+    </PageTransition>
   );
 }

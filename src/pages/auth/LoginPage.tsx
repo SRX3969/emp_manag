@@ -19,6 +19,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { Role } from '@/types/auth';
+import { PageTransition } from '@/components/motion/Motion';
 
 export function LoginPage() {
   const { login, currentOrg } = useAuth();
@@ -116,7 +117,7 @@ export function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA] text-[#171717] dark:bg-[#101113] dark:text-[#F5F5F5] flex flex-col justify-center items-center p-4 sm:p-6 select-none">
-      <div className="w-full max-w-lg space-y-6">
+      <PageTransition variant="scale" className="w-full max-w-lg space-y-6">
         {/* Brand & Organization Header */}
         <div className="text-center space-y-2">
           <div className="w-12 h-12 rounded-xl bg-blue-600 text-white font-bold text-xl flex items-center justify-center mx-auto shadow-md ring-4 ring-blue-500/10">
@@ -288,7 +289,7 @@ export function LoginPage() {
           </p>
           <p>Protected by Enterprise TLS 1.3 encryption and Convex backend authorization.</p>
         </div>
-      </div>
+      </PageTransition>
     </div>
   );
 }

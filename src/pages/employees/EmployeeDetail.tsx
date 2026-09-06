@@ -27,6 +27,7 @@ import {
   UserCheck,
 } from 'lucide-react';
 import { EmployeeStatus } from '@/types/employee';
+import { PageTransition, ProfileReveal } from '@/components/motion/Motion';
 
 export function EmployeeDetail() {
   const { id } = useParams<{ id: string }>();
@@ -105,7 +106,7 @@ export function EmployeeDetail() {
   ];
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       {/* Top Breadcrumbs & Action Bar */}
       <PageHeader
         title={employee.fullName}
@@ -134,7 +135,7 @@ export function EmployeeDetail() {
       />
 
       {/* Main Profile Header Card */}
-      <div className="rounded-lg border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] p-6 shadow-sm">
+      <div className="rounded-xl border border-slate-200 bg-white dark:border-[#292B30] dark:bg-[#17181B] p-6 shadow-xs">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-start gap-4">
             <Avatar
@@ -599,6 +600,6 @@ export function EmployeeDetail() {
           </div>
         </div>
       )}
-    </div>
+    </PageTransition>
   );
 }

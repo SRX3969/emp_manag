@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/Select';
 import { formatDate } from '@/lib/utils';
 import { Megaphone, Plus, Pin, CheckCircle2, Eye, Calendar } from 'lucide-react';
 import { AnnouncementItem } from '@/types/system';
+import { PageTransition, RevealCard } from '@/components/motion/Motion';
 
 export function AnnouncementsPage() {
   const { announcements, createAnnouncement, markAnnouncementRead } = useData();
@@ -51,7 +52,7 @@ export function AnnouncementsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <PageHeader
         title="Company Announcements & Notices"
         description="Official executive bulletins, benefits policy notices, and corporate all-hands memos."
@@ -65,12 +66,13 @@ export function AnnouncementsPage() {
         }
       />
 
-      {/* Announcements List */}
+      {/* Bulletins List */}
       <div className="space-y-4">
-        {announcements.map((ann) => (
-          <div
+        {announcements.map((ann, idx) => (
+          <RevealCard
             key={ann.id}
-            className={`p-6 rounded-lg border bg-white dark:bg-[#17181B] shadow-sm text-xs space-y-3 transition-all ${
+            delayMs={40 * (idx + 1)}
+            className={`p-6 text-xs space-y-3 transition-all ${
               ann.isPinned
                 ? 'border-blue-300 dark:border-blue-900/60 ring-1 ring-blue-100 dark:ring-blue-950'
                 : 'border-slate-200 dark:border-[#292B30]'
@@ -121,7 +123,7 @@ export function AnnouncementsPage() {
                 <span>Acknowledged ({ann.readCount} views)</span>
               </button>
             </div>
-          </div>
+          </RevealCard>
         ))}
       </div>
 
@@ -184,6 +186,6 @@ export function AnnouncementsPage() {
           </div>
         </form>
       </Dialog>
-    </div>
+    </PageTransition>
   );
 }

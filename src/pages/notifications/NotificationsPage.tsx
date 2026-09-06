@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { formatDateTime } from '@/lib/utils';
 import { Bell, CheckCheck, CheckCircle2, ArrowRight } from 'lucide-react';
+import { PageTransition } from '@/components/motion/Motion';
 
 export function NotificationsPage() {
   const { notifications, markNotificationRead, markAllNotificationsRead } = useData();
@@ -14,7 +15,7 @@ export function NotificationsPage() {
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
+    <PageTransition className="space-y-6 max-w-4xl mx-auto">
       <PageHeader
         title="Notification Center"
         description="Real-time alerts for leave approvals, payroll disbursements, announcements, and task updates."
@@ -100,6 +101,6 @@ export function NotificationsPage() {
           )}
         </div>
       </div>
-    </div>
+    </PageTransition>
   );
 }

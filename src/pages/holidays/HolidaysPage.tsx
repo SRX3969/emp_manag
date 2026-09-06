@@ -10,6 +10,7 @@ import { Select } from '@/components/ui/Select';
 import { formatDate } from '@/lib/utils';
 import { CalendarRange, Plus, Trash2, Calendar } from 'lucide-react';
 import { Holiday } from '@/types/leave';
+import { PageTransition } from '@/components/motion/Motion';
 
 export function HolidaysPage() {
   const { holidays, addHoliday, deleteHoliday } = useData();
@@ -57,7 +58,7 @@ export function HolidaysPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <PageTransition className="space-y-6">
       <PageHeader
         title="Official Holiday Calendar"
         description="Public holidays, corporate designated non-working days, and optional cultural observances."
@@ -159,14 +160,14 @@ export function HolidaysPage() {
           />
           <div className="grid grid-cols-2 gap-4">
             <Input
-              label="Date"
+              label="Holiday Date"
               type="date"
               required
               value={form.date}
               onChange={(e) => setForm({ ...form, date: e.target.value })}
             />
             <Select
-              label="Classification"
+              label="Holiday Type"
               value={form.type}
               onChange={(e) => setForm({ ...form, type: e.target.value as any })}
               options={[
@@ -209,6 +210,6 @@ export function HolidaysPage() {
         confirmText="Delete"
         variant="danger"
       />
-    </div>
+    </PageTransition>
   );
 }
