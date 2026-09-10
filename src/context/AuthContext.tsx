@@ -141,21 +141,47 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return newOrg;
   };
 
-  const login = (email: string, _password?: string, targetRole?: Role): boolean => {
-    let matchedUser = targetRole ? mockUsers.find((u) => u.role === targetRole) : null;
-    if (!matchedUser) {
-      matchedUser = mockUsers.find((u) => u.email.toLowerCase() === email.toLowerCase());
+  const login = (email: string, password?: string, targetRole?: Role): boolean => {
+    // 1. Validate Password (must match the system demo credential)
+    const REQUIRED_PASSWORD = 'password123';
+    if (!password || password.trim() !== REQUIRED_PASSWORD) {
+      return false;
     }
+
+    // 2. Validate Username / Email against registered users and employees
+    const normalizedEmail = email.trim().toLowerCase();
+    
+    // Check in mockUsers
+    let matchedUser = mockUsers.find(
+      (u) =>
+        u.email.toLowerCase() === normalizedEmail ||
+        u.email.toLowerCase().replace('.in', '.com') === normalizedEmail ||
+        u.email.toLowerCase().replace('.com', '.in') === normalizedEmail
+    );
+
+    // Support additional demo personas
     if (!matchedUser) {
-      // Fallback for custom emails
-      matchedUser = {
-        id: `user_${Date.now()}`,
-        email,
-        name: email.split('@')[0].replace('.', ' ').replace(/\b\w/g, (l) => l.toUpperCase()),
-        role: targetRole || 'EMPLOYEE',
-        organizationId: currentOrg.id,
-        createdAt: new Date().toISOString(),
-      };
+      if (normalizedEmail === 'elena.rostova@apexglobal.com' || normalizedEmail === 'elena.rostova@apexglobal.in') {
+        matchedUser = {
+          id: 'user_elena',
+          email: 'elena.rostova@apexglobal.com',
+          name: 'Elena Rostova',
+          avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&auto=format&fit=crop&q=80',
+          role: 'EMPLOYEE',
+          organizationId: currentOrg.id,
+          createdAt: new Date().toISOString(),
+        };
+      }
+    }
+
+    // If targetRole is explicitly supplied (e.g. from quick persona select)
+    if (!matchedUser && targetRole) {
+      matchedUser = mockUsers.find((u) => u.role === targetRole);
+    }
+
+    // If no matching registered account found, reject login
+    if (!matchedUser) {
+      return false;
     }
 
     setCurrentUser({

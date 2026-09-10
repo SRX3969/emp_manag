@@ -95,8 +95,8 @@ export function LoginPage() {
 
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) {
-      setErrorMessage('Please enter your email address.');
+    if (!email.trim() || !password) {
+      setErrorMessage('Please enter both username/email and password.');
       return;
     }
 
@@ -104,19 +104,29 @@ export function LoginPage() {
     setErrorMessage('');
 
     setTimeout(() => {
-      login(email, password, portalMode === 'EMPLOYEE' ? 'EMPLOYEE' : undefined);
+      const success = login(email.trim(), password);
       setIsLoading(false);
-      navigate('/dashboard');
+      if (success) {
+        navigate('/dashboard');
+      } else {
+        setErrorMessage('Invalid username or password.');
+      }
     }, 300);
   };
 
   const handleQuickPersonaLogin = (personaEmail: string, personaRole: Role) => {
     setEmail(personaEmail);
+    setPassword('password123');
     setIsLoading(true);
+    setErrorMessage('');
     setTimeout(() => {
-      login(personaEmail, 'password123', personaRole);
+      const success = login(personaEmail, 'password123', personaRole);
       setIsLoading(false);
-      navigate('/dashboard');
+      if (success) {
+        navigate('/dashboard');
+      } else {
+        setErrorMessage('Invalid username or password.');
+      }
     }, 200);
   };
 
