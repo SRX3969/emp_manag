@@ -48,40 +48,43 @@ export function Dialog({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-50 overflow-y-auto">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity animate-reveal-fade"
         onClick={onClose}
       />
 
-      {/* Modal Dialog Card */}
-      <div
-        className={cn(
-          'relative w-full rounded-2xl bg-white dark:bg-[#12131A] border border-slate-200 dark:border-[#242838] shadow-2xl transition-all z-10 animate-reveal-scale my-4 sm:my-8 max-w-full overflow-hidden',
-          maxWidths[maxWidth]
-        )}
-      >
-        <div className="flex items-start justify-between border-b border-slate-100 dark:border-[#242838] px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50/50 dark:bg-[#161822]/60">
-          <div>
-            <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 font-heading">
-              {title}
-            </h3>
-            {description && (
-              <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                {description}
-              </p>
-            )}
+      {/* Scrollable alignment wrapper */}
+      <div className="flex min-h-full items-center justify-center p-3 sm:p-6 text-center">
+        {/* Modal Dialog Card */}
+        <div
+          className={cn(
+            'relative w-full rounded-2xl bg-white dark:bg-[#12131A] border border-slate-200 dark:border-[#242838] shadow-2xl transition-all z-10 animate-reveal-scale my-6 max-w-full text-left flex flex-col max-h-[calc(100vh-3rem)] overflow-hidden',
+            maxWidths[maxWidth]
+          )}
+        >
+          <div className="flex items-start justify-between border-b border-slate-100 dark:border-[#242838] px-4 sm:px-6 py-3.5 sm:py-4 bg-slate-50/50 dark:bg-[#161822]/60 shrink-0">
+            <div>
+              <h3 className="text-sm sm:text-base font-bold text-slate-900 dark:text-slate-100 font-heading">
+                {title}
+              </h3>
+              {description && (
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  {description}
+                </p>
+              )}
+            </div>
+            <button
+              onClick={onClose}
+              className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200/60 hover:text-slate-700 dark:hover:bg-[#1A1C26] dark:hover:text-slate-200 transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
-          <button
-            onClick={onClose}
-            className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-200/60 hover:text-slate-700 dark:hover:bg-[#1A1C26] dark:hover:text-slate-200 transition-colors cursor-pointer"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
 
-        <div className="px-3.5 sm:px-6 py-4 sm:py-5 max-h-[calc(90vh-90px)] overflow-y-auto">{children}</div>
+          <div className="px-3.5 sm:px-6 py-4 sm:py-5 overflow-y-auto flex-1">{children}</div>
+        </div>
       </div>
     </div>
   );

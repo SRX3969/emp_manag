@@ -394,26 +394,49 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     );
   }, [currentOrg.id]);
 
-  // Save changes to localStorage per organization
-  useEffect(() => { localStorage.setItem(getStorageKey('employees'), JSON.stringify(employees)); }, [employees, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('departments'), JSON.stringify(departments)); }, [departments, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('attendance'), JSON.stringify(attendanceRecords)); }, [attendanceRecords, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('leaveTypes'), JSON.stringify(leaveTypes)); }, [leaveTypes, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('leaveBalances'), JSON.stringify(leaveBalances)); }, [leaveBalances, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('leaveRequests'), JSON.stringify(leaveRequests)); }, [leaveRequests, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('holidays'), JSON.stringify(holidays)); }, [holidays, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('payrollRuns'), JSON.stringify(payrollRuns)); }, [payrollRuns, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('payslips'), JSON.stringify(payslips)); }, [payslips, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('goals'), JSON.stringify(goals)); }, [goals, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('reviews'), JSON.stringify(reviews)); }, [reviews, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('documents'), JSON.stringify(documents)); }, [documents, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('tasks'), JSON.stringify(tasks)); }, [tasks, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('announcements'), JSON.stringify(announcements)); }, [announcements, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('jobs'), JSON.stringify(jobs)); }, [jobs, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('candidates'), JSON.stringify(candidates)); }, [candidates, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('auditLogs'), JSON.stringify(auditLogs)); }, [auditLogs, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('notifications'), JSON.stringify(notifications)); }, [notifications, currentOrg.id]);
-  useEffect(() => { localStorage.setItem(getStorageKey('settings'), JSON.stringify(settings)); }, [settings, currentOrg.id]);
+  // Save changes to localStorage per organization cleanly
+  useEffect(() => {
+    localStorage.setItem(`emp_data_${currentOrg.id}_employees`, JSON.stringify(employees));
+    localStorage.setItem(`emp_data_${currentOrg.id}_departments`, JSON.stringify(departments));
+    localStorage.setItem(`emp_data_${currentOrg.id}_attendance`, JSON.stringify(attendanceRecords));
+    localStorage.setItem(`emp_data_${currentOrg.id}_leaveTypes`, JSON.stringify(leaveTypes));
+    localStorage.setItem(`emp_data_${currentOrg.id}_leaveBalances`, JSON.stringify(leaveBalances));
+    localStorage.setItem(`emp_data_${currentOrg.id}_leaveRequests`, JSON.stringify(leaveRequests));
+    localStorage.setItem(`emp_data_${currentOrg.id}_holidays`, JSON.stringify(holidays));
+    localStorage.setItem(`emp_data_${currentOrg.id}_payrollRuns`, JSON.stringify(payrollRuns));
+    localStorage.setItem(`emp_data_${currentOrg.id}_payslips`, JSON.stringify(payslips));
+    localStorage.setItem(`emp_data_${currentOrg.id}_goals`, JSON.stringify(goals));
+    localStorage.setItem(`emp_data_${currentOrg.id}_reviews`, JSON.stringify(reviews));
+    localStorage.setItem(`emp_data_${currentOrg.id}_documents`, JSON.stringify(documents));
+    localStorage.setItem(`emp_data_${currentOrg.id}_tasks`, JSON.stringify(tasks));
+    localStorage.setItem(`emp_data_${currentOrg.id}_announcements`, JSON.stringify(announcements));
+    localStorage.setItem(`emp_data_${currentOrg.id}_jobs`, JSON.stringify(jobs));
+    localStorage.setItem(`emp_data_${currentOrg.id}_candidates`, JSON.stringify(candidates));
+    localStorage.setItem(`emp_data_${currentOrg.id}_auditLogs`, JSON.stringify(auditLogs));
+    localStorage.setItem(`emp_data_${currentOrg.id}_notifications`, JSON.stringify(notifications));
+    localStorage.setItem(`emp_data_${currentOrg.id}_settings`, JSON.stringify(settings));
+  }, [
+    currentOrg.id,
+    employees,
+    departments,
+    attendanceRecords,
+    leaveTypes,
+    leaveBalances,
+    leaveRequests,
+    holidays,
+    payrollRuns,
+    payslips,
+    goals,
+    reviews,
+    documents,
+    tasks,
+    announcements,
+    jobs,
+    candidates,
+    auditLogs,
+    notifications,
+    settings,
+  ]);
 
   const logAction = (action: string, entity: string, details: string, entityId?: string) => {
     const newLog: AuditLogItem = {
